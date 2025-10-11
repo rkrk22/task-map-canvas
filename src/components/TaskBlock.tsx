@@ -23,6 +23,12 @@ export const TaskBlock = ({
   const baseSize = 100;
   const scaledSize = Math.max(baseSize, Math.min(baseSize * size, 400));
   
+  // Dynamic font sizes based on card size
+  const titleFontSize = Math.max(10, Math.min(scaledSize / 8, 16));
+  const detailFontSize = Math.max(8, Math.min(scaledSize / 12, 12));
+  const iconSize = Math.max(10, Math.min(scaledSize / 15, 14));
+  const padding = Math.max(8, Math.min(scaledSize / 10, 16));
+  
   const gradientIndex = importance > 5 ? 1 : 2;
 
   return (
@@ -38,23 +44,27 @@ export const TaskBlock = ({
         width: `${scaledSize}px`,
         height: `${scaledSize}px`,
         background: `var(--task-gradient-${gradientIndex})`,
+        padding: `${padding}px`,
       }}
     >
-      <div className="flex h-full flex-col justify-between p-4 text-white">
+      <div className="flex h-full flex-col justify-between text-gray-700">
         <div>
-          <h3 className="line-clamp-3 text-sm font-semibold md:text-base">
+          <h3 
+            className="line-clamp-3 font-semibold"
+            style={{ fontSize: `${titleFontSize}px` }}
+          >
             {title}
           </h3>
         </div>
         
-        <div className="space-y-2">
-          <div className="flex items-center gap-1 text-xs opacity-90">
-            <Calendar className="h-3 w-3" />
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
+            <Calendar style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
             <span>{format(new Date(deadline), "MMM d")}</span>
           </div>
           
-          <div className="flex items-center gap-1 text-xs opacity-90">
-            <Star className="h-3 w-3 fill-current" />
+          <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
+            <Star style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="fill-current" />
             <span>{importance}/10</span>
           </div>
         </div>
@@ -63,10 +73,14 @@ export const TaskBlock = ({
       <Button
         size="icon"
         variant="destructive"
-        className="absolute -right-2 -top-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100"
+        className="absolute -right-2 -top-2 opacity-0 transition-opacity group-hover:opacity-100"
+        style={{ 
+          width: `${Math.max(24, scaledSize / 8)}px`, 
+          height: `${Math.max(24, scaledSize / 8)}px` 
+        }}
         onClick={() => onDelete(id)}
       >
-        <Trash2 className="h-3 w-3" />
+        <Trash2 style={{ width: `${Math.max(12, scaledSize / 16)}px`, height: `${Math.max(12, scaledSize / 16)}px` }} />
       </Button>
     </motion.div>
   );
