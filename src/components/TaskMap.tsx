@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskBlock } from "./TaskBlock";
 import { AddTaskForm } from "./AddTaskForm";
+import { EditTaskDialog } from "./EditTaskDialog";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -26,6 +27,7 @@ export const TaskMap = () => {
     newTask: { title: string; deadline: string; importance: number };
     conflicts: Task[];
   } | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -137,6 +139,21 @@ export const TaskMap = () => {
     }
   };
 
+  const handleUpdateTask = async (
+    id: string,
+    updates: { title: string; deadline: string; importance: number }
+  ) => {
+    const { error } = await supabase
+      .from("tasks")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update task");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-7xl">
@@ -165,6 +182,7 @@ export const TaskMap = () => {
                 deadline={task.deadline}
                 importance={task.importance}
                 size={calculateSize(task.deadline, task.importance)}
+                onClick={() => setEditingTask(task)}
                 onDelete={handleDeleteTask}
               />
             ))
@@ -218,6 +236,12 @@ export const TaskMap = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <EditTaskDialog
+        task={editingTask}
+        onClose={() => setEditingTask(null)}
+        onUpdate={handleUpdateTask}
+      />
     </div>
   );
 };

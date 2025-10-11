@@ -9,6 +9,7 @@ interface TaskBlockProps {
   deadline: string;
   importance: number;
   size: number;
+  onClick: () => void;
   onDelete: (id: string) => void;
 }
 
@@ -18,6 +19,7 @@ export const TaskBlock = ({
   deadline,
   importance,
   size,
+  onClick,
   onDelete,
 }: TaskBlockProps) => {
   const baseSize = 100;
@@ -39,7 +41,8 @@ export const TaskBlock = ({
       exit={{ scale: 0, opacity: 0 }}
       whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      className="group relative rounded-xl shadow-lg hover:shadow-xl"
+      className="group relative cursor-pointer rounded-xl shadow-lg transition-all hover:shadow-xl"
+      onClick={onClick}
       style={{
         width: `${scaledSize}px`,
         height: `${scaledSize}px`,
@@ -78,7 +81,10 @@ export const TaskBlock = ({
           width: `${Math.max(24, scaledSize / 8)}px`, 
           height: `${Math.max(24, scaledSize / 8)}px` 
         }}
-        onClick={() => onDelete(id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(id);
+        }}
       >
         <Trash2 style={{ width: `${Math.max(12, scaledSize / 16)}px`, height: `${Math.max(12, scaledSize / 16)}px` }} />
       </Button>

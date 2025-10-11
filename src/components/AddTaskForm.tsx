@@ -12,7 +12,8 @@ interface AddTaskFormProps {
 
 export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [title, setTitle] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const today = new Date().toISOString().split("T")[0];
+  const [deadline, setDeadline] = useState(today);
   const [importance, setImportance] = useState(5);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -30,7 +31,7 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
 
     onAdd({ title, deadline, importance });
     setTitle("");
-    setDeadline("");
+    setDeadline(today);
     setImportance(5);
     toast.success("Task added successfully!");
   };

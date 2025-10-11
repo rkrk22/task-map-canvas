@@ -39,9 +39,9 @@ All colors MUST be HSL.
     --radius: 0.75rem;
     
     /* Custom task colors - pastel palette */
-    --task-gradient-1: linear-gradient(135deg, hsl(340 40% 75%) 0%, hsl(320 35% 80%) 100%);
-    --task-gradient-2: linear-gradient(135deg, hsl(200 35% 75%) 0%, hsl(180 40% 80%) 100%);
-    --task-shadow: 0 4px 20px -4px hsl(250 30% 70% / 0.3);
+    --task-gradient-1: linear-gradient(135deg, hsl(330 45% 80%) 0%, hsl(310 40% 85%) 100%);
+    --task-gradient-2: linear-gradient(135deg, hsl(190 40% 78%) 0%, hsl(170 45% 82%) 100%);
+    --task-shadow: 0 4px 20px -4px hsl(250 25% 65% / 0.25);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
