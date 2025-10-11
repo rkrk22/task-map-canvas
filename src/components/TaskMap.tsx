@@ -5,15 +5,6 @@ import { TaskSidebar } from "./TaskSidebar";
 import { EditTaskDialog } from "./EditTaskDialog";
 import { toast } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ArrowUp, ArrowDown } from "lucide-react";
 
 interface Task {
   id: string;
@@ -24,10 +15,6 @@ interface Task {
 
 export const TaskMap = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [conflictDialog, setConflictDialog] = useState<{
-    newTask: { title: string; deadline: string; importance: number };
-    conflicts: Task[];
-  } | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -87,17 +74,25 @@ export const TaskMap = () => {
     deadline: string;
     importance: number;
   }) => {
-    const newSize = calculateSize(task.deadline, task.importance);
+    // Check if there's already a task with the same importance
+    const conflictingTasks = tasks.filter((t) => t.importance === task.importance);
     
-    // Check for conflicts (tasks with similar size ±0.05)
-    const conflicts = tasks.filter((t) => {
-      const taskSize = calculateSize(t.deadline, t.importance);
-      return Math.abs(taskSize - newSize) < 0.05;
-    });
-
-    if (conflicts.length > 0) {
-      setConflictDialog({ newTask: task, conflicts });
-      return;
+    if (conflictingTasks.length > 0) {
+      // Shift all tasks with importance >= new task's importance up by 1
+      const updates = tasks
+        .filter((t) => t.importance >= task.importance)
+        .map((t) => ({
+          id: t.id,
+          importance: Math.min(10, t.importance + 1)
+        }));
+      
+      // Update all conflicting tasks
+      for (const update of updates) {
+        await supabase
+          .from("tasks")
+          .update({ importance: update.importance })
+          .eq("id", update.id);
+      }
     }
 
     await insertTask(task);
@@ -113,22 +108,9 @@ export const TaskMap = () => {
     if (error) {
       toast.error("Failed to add task");
       console.error(error);
+    } else {
+      toast.success("Task added");
     }
-  };
-
-  const handleResolveConflict = async (makePriority: boolean) => {
-    if (!conflictDialog) return;
-
-    const { newTask } = conflictDialog;
-    const adjustedTask = {
-      ...newTask,
-      importance: makePriority 
-        ? Math.min(10, newTask.importance + 1)
-        : Math.max(1, newTask.importance - 1),
-    };
-
-    await insertTask(adjustedTask);
-    setConflictDialog(null);
   };
 
   const handleDeleteTask = async (id: string) => {
@@ -146,6 +128,33 @@ export const TaskMap = () => {
     id: string,
     updates: { title: string; deadline: string; importance: number }
   ) => {
+    const currentTask = tasks.find((t) => t.id === id);
+    if (!currentTask) return;
+
+    // If importance changed, check for conflicts
+    if (currentTask.importance !== updates.importance) {
+      const conflictingTasks = tasks.filter(
+        (t) => t.id !== id && t.importance === updates.importance
+      );
+      
+      if (conflictingTasks.length > 0) {
+        // Shift all tasks with importance >= new importance up by 1
+        const tasksToUpdate = tasks
+          .filter((t) => t.id !== id && t.importance >= updates.importance)
+          .map((t) => ({
+            id: t.id,
+            importance: Math.min(10, t.importance + 1)
+          }));
+        
+        for (const task of tasksToUpdate) {
+          await supabase
+            .from("tasks")
+            .update({ importance: task.importance })
+            .eq("id", task.id);
+        }
+      }
+    }
+
     const { error } = await supabase
       .from("tasks")
       .update(updates)
@@ -154,6 +163,8 @@ export const TaskMap = () => {
     if (error) {
       toast.error("Failed to update task");
       console.error(error);
+    } else {
+      toast.success("Task updated");
     }
   };
 
@@ -196,53 +207,6 @@ export const TaskMap = () => {
           </div>
         </main>
       </div>
-
-      <Dialog open={!!conflictDialog} onOpenChange={() => setConflictDialog(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Priority Conflict Detected</DialogTitle>
-            <DialogDescription>
-              Your new task has the same priority as existing tasks. Which one is more important?
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="rounded-lg bg-muted p-4">
-              <p className="font-semibold mb-1">New task:</p>
-              <p className="text-sm text-muted-foreground line-clamp-2">{conflictDialog?.newTask.title}</p>
-            </div>
-
-            <div className="rounded-lg bg-muted p-4">
-              <p className="font-semibold mb-1">Conflicts with:</p>
-              <div className="max-h-32 overflow-y-auto space-y-1">
-                {conflictDialog?.conflicts.map((task) => (
-                  <p key={task.id} className="text-sm text-muted-foreground line-clamp-1">
-                    • {task.title}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={() => handleResolveConflict(true)}
-                className="flex-1"
-              >
-                <ArrowUp className="mr-2 h-4 w-4 flex-shrink-0" />
-                <span className="truncate">More important</span>
-              </Button>
-              <Button
-                onClick={() => handleResolveConflict(false)}
-                variant="outline"
-                className="flex-1"
-              >
-                <ArrowDown className="mr-2 h-4 w-4 flex-shrink-0" />
-                <span className="truncate">Less important</span>
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <EditTaskDialog
         task={editingTask}
