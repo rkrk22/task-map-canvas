@@ -76,7 +76,9 @@ export const TaskMap = () => {
       Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
     );
     
-    return importance * (1 / daysToDeadline);
+    // Enhanced formula: base importance multiplied by urgency factor
+    const urgencyFactor = Math.min(10, 30 / daysToDeadline);
+    return (importance / 10) * urgencyFactor;
   };
 
   const handleAddTask = async (task: {
