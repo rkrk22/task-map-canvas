@@ -38,8 +38,8 @@ export const TaskBlock = ({
       layout
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
-      whileHover={{ scale: 1.05 }}
+      exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
+      whileHover={{ scale: 1.05, transition: { duration: 0.15 } }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="group relative cursor-pointer rounded-xl shadow-lg transition-all hover:shadow-xl"
       onClick={onClick}
