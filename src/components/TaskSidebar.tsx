@@ -15,13 +15,10 @@ interface TaskSidebarProps {
 
 export function TaskSidebar({ onAdd }: TaskSidebarProps) {
   return (
-    <Sidebar className="w-80">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <Plus className="h-5 w-5 text-primary" />
-          <h2 className="font-semibold">Add Task</h2>
-        </div>
-        <SidebarTrigger />
+    <Sidebar className="w-80 border-border" collapsible="none">
+      <div className="flex items-center gap-2 p-4 border-b">
+        <Plus className="h-5 w-5 text-primary" />
+        <h2 className="font-semibold">Add Task</h2>
       </div>
       
       <SidebarContent>

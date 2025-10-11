@@ -158,20 +158,17 @@ export const TaskMap = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-screen w-full gap-6 p-6">
         <TaskSidebar onAdd={handleAddTask} />
         
-        <main className="flex-1 bg-background p-8">
+        <main className="flex-1 bg-background">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
-                <p className="text-muted-foreground">
-                  Visualize your tasks by priority and deadline
-                </p>
-              </div>
-              <SidebarTrigger />
+            <div className="mb-8">
+              <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
+              <p className="text-muted-foreground">
+                Visualize your tasks by priority and deadline
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-6 rounded-2xl border-2 border-border bg-muted/20 p-8">
