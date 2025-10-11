@@ -118,8 +118,8 @@ export const TaskMap = () => {
     const adjustedTask = {
       ...newTask,
       importance: makePriority 
-        ? Math.min(10, newTask.importance + 0.1)
-        : Math.max(1, newTask.importance - 0.1),
+        ? Math.min(10, newTask.importance + 1)
+        : Math.max(1, newTask.importance - 1),
     };
 
     await insertTask(adjustedTask);
@@ -183,17 +183,19 @@ export const TaskMap = () => {
 
           <div className="space-y-4">
             <div className="rounded-lg bg-muted p-4">
-              <p className="font-semibold">New task:</p>
-              <p className="text-sm text-muted-foreground">{conflictDialog?.newTask.title}</p>
+              <p className="font-semibold mb-1">New task:</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">{conflictDialog?.newTask.title}</p>
             </div>
 
             <div className="rounded-lg bg-muted p-4">
-              <p className="font-semibold">Conflicts with:</p>
-              {conflictDialog?.conflicts.map((task) => (
-                <p key={task.id} className="text-sm text-muted-foreground">
-                  • {task.title}
-                </p>
-              ))}
+              <p className="font-semibold mb-1">Conflicts with:</p>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {conflictDialog?.conflicts.map((task) => (
+                  <p key={task.id} className="text-sm text-muted-foreground line-clamp-1">
+                    • {task.title}
+                  </p>
+                ))}
+              </div>
             </div>
 
             <div className="flex gap-3">
@@ -201,16 +203,16 @@ export const TaskMap = () => {
                 onClick={() => handleResolveConflict(true)}
                 className="flex-1"
               >
-                <ArrowUp className="mr-2 h-4 w-4" />
-                New task is MORE important
+                <ArrowUp className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">More important</span>
               </Button>
               <Button
                 onClick={() => handleResolveConflict(false)}
                 variant="outline"
                 className="flex-1"
               >
-                <ArrowDown className="mr-2 h-4 w-4" />
-                New task is LESS important
+                <ArrowDown className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">Less important</span>
               </Button>
             </div>
           </div>
