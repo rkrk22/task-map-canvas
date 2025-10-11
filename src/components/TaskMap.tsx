@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskBlock } from "./TaskBlock";
-import { AddTaskForm } from "./AddTaskForm";
+import { TaskSidebar } from "./TaskSidebar";
 import { EditTaskDialog } from "./EditTaskDialog";
 import { toast } from "sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Dialog,
   DialogContent,
@@ -157,39 +158,46 @@ export const TaskMap = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
-          <p className="text-muted-foreground">
-            Visualize your tasks by priority and deadline
-          </p>
-        </div>
-
-        <AddTaskForm onAdd={handleAddTask} />
-
-        <div className="flex flex-wrap gap-6 rounded-2xl border-2 border-border bg-muted/20 p-8">
-          {tasks.length === 0 ? (
-            <div className="flex w-full items-center justify-center py-20">
-              <p className="text-lg text-muted-foreground">
-                No tasks yet. Add your first task above!
-              </p>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <TaskSidebar onAdd={handleAddTask} />
+        
+        <main className="flex-1 bg-background p-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
+                <p className="text-muted-foreground">
+                  Visualize your tasks by priority and deadline
+                </p>
+              </div>
+              <SidebarTrigger />
             </div>
-          ) : (
-            tasks.map((task) => (
-              <TaskBlock
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                deadline={task.deadline}
-                importance={task.importance}
-                size={calculateSize(task.deadline, task.importance)}
-                onClick={() => setEditingTask(task)}
-                onDelete={handleDeleteTask}
-              />
-            ))
-          )}
-        </div>
+
+            <div className="flex flex-wrap gap-6 rounded-2xl border-2 border-border bg-muted/20 p-8">
+              {tasks.length === 0 ? (
+                <div className="flex w-full items-center justify-center py-20">
+                  <p className="text-lg text-muted-foreground">
+                    No tasks yet. Add your first task using the sidebar!
+                  </p>
+                </div>
+              ) : (
+                tasks.map((task) => (
+                  <TaskBlock
+                    key={task.id}
+                    id={task.id}
+                    title={task.title}
+                    deadline={task.deadline}
+                    importance={task.importance}
+                    size={calculateSize(task.deadline, task.importance)}
+                    onClick={() => setEditingTask(task)}
+                    onDelete={handleDeleteTask}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </main>
       </div>
 
       <Dialog open={!!conflictDialog} onOpenChange={() => setConflictDialog(null)}>
@@ -244,6 +252,6 @@ export const TaskMap = () => {
         onClose={() => setEditingTask(null)}
         onUpdate={handleUpdateTask}
       />
-    </div>
+    </SidebarProvider>
   );
 };

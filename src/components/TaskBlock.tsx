@@ -22,8 +22,8 @@ export const TaskBlock = ({
   onClick,
   onDelete,
 }: TaskBlockProps) => {
-  const baseSize = 100;
-  const scaledSize = Math.max(baseSize, Math.min(baseSize * size, 400));
+  const baseSize = 80;
+  const scaledSize = baseSize + (size * 40); // Более выраженная разница в размерах
   
   // Dynamic font sizes based on card size
   const titleFontSize = Math.max(10, Math.min(scaledSize / 8, 16));
