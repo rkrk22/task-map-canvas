@@ -117,14 +117,26 @@ export const TaskMap = () => {
     if (!conflictDialog) return;
 
     const { newTask } = conflictDialog;
-    const adjustedTask = {
-      ...newTask,
-      importance: makePriority 
-        ? Math.min(10, newTask.importance + 1)
-        : Math.max(1, newTask.importance - 1),
-    };
-
-    await insertTask(adjustedTask);
+    
+    if (makePriority) {
+      // Новая задача важнее - сдвигаем все конфликтующие задачи вниз (уменьшаем приоритет)
+      for (const conflict of conflictDialog.conflicts) {
+        await supabase
+          .from("tasks")
+          .update({ importance: Math.max(1, conflict.importance - 1) })
+          .eq("id", conflict.id);
+      }
+      // Добавляем новую задачу с исходным приоритетом
+      await insertTask(newTask);
+    } else {
+      // Новая задача менее важная - понижаем её приоритет
+      const adjustedTask = {
+        ...newTask,
+        importance: Math.max(1, newTask.importance - 1),
+      };
+      await insertTask(adjustedTask);
+    }
+    
     setConflictDialog(null);
   };
 
