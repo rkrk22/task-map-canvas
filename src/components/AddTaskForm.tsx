@@ -9,6 +9,8 @@ import { Plus, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase"; // ← ДОБАВЬ
+
 interface AddTaskFormProps {
   onAdd: (task: {
     title: string;
@@ -16,33 +18,54 @@ interface AddTaskFormProps {
     importance: number;
   }) => void;
 }
-export const AddTaskForm = ({
-  onAdd
-}: AddTaskFormProps) => {
+
+export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => { // ← async
     e.preventDefault();
     if (!title.trim()) {
       toast.error("Please enter a task title");
       return;
     }
-    onAdd({
+
+    const payload = {
       title,
       deadline: format(date, "yyyy-MM-dd"),
-      importance
-    });
+      importance,
+      status: "todo", // опционально
+    };
+
+    // Пишем в Supabase
+    const { error } = await supabase.from("tasks").insert(payload);
+    if (error) {
+      toast.error("Supabase error: " + error.message);
+      return;
+    }
+
+    // Локальный колбэк оставляем как было (если нужен)
+    onAdd?.(payload);
+
     setTitle("");
     setDate(new Date());
     setImportance(5);
-    toast.success("Task added successfully!");
+    toast.success("Task added to Supabase");
   };
-  return <Card className="mb-8 border-2 p-6 bg-gray-50">
+
+  return (
+    <Card className="mb-8 border-2 p-6 bg-gray-50">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
-          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" />
+          <Input
+            id="title"
+            placeholder="Enter task name..."
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="border-2"
+          />
         </div>
 
         <div className="space-y-4">
@@ -52,10 +75,7 @@ export const AddTaskForm = ({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal border-2",
-                    !date && "text-muted-foreground"
-                  )}
+                  className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -66,7 +86,7 @@ export const AddTaskForm = ({
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => newDate && setDate(newDate)}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                   className="pointer-events-auto"
                 />
@@ -75,9 +95,7 @@ export const AddTaskForm = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="importance">
-              Importance: {importance}/10
-            </Label>
+            <Label htmlFor="importance">Importance: {importance}/10</Label>
             <input
               id="importance"
               type="range"
@@ -95,5 +113,6 @@ export const AddTaskForm = ({
           Add Task
         </Button>
       </form>
-    </Card>;
+    </Card>
+  );
 };
