@@ -110,8 +110,6 @@ export const TaskMap = () => {
       console.error(error);
     } else {
       toast.success("Task added");
-            ait fetchTasks();
-        
     }
   };
 
