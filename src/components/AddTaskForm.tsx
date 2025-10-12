@@ -1,4 +1,3 @@
-// src/components/.../AddTaskForm.tsx
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +9,14 @@ import { Plus, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase"; // ← добавь
+import { supabase } from "@/lib/supabase"; // ← ДОБАВЬ
 
 interface AddTaskFormProps {
-  onAdd: (task: { title: string; deadline: string; importance: number }) => void;
+  onAdd: (task: {
+    title: string;
+    deadline: string;
+    importance: number;
+  }) => void;
 }
 
 export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
@@ -21,26 +24,30 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => { // ← async
     e.preventDefault();
     if (!title.trim()) {
       toast.error("Please enter a task title");
       return;
     }
+
     const payload = {
       title,
       deadline: format(date, "yyyy-MM-dd"),
       importance,
+      status: "todo", // опционально
     };
 
-    // пишем ТОЛЬКО в Supabase → таблица public.tasks
+    // Пишем в Supabase
     const { error } = await supabase.from("tasks").insert(payload);
     if (error) {
-      toast.error("Supabase: " + error.message);
+      toast.error("Supabase error: " + error.message);
       return;
     }
 
-    onAdd?.(payload); // можно оставить для локального обновления UI
+    // Локальный колбэк оставляем как было (если нужен)
+    onAdd?.(payload);
+
     setTitle("");
     setDate(new Date());
     setImportance(5);
@@ -52,7 +59,13 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
-          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" />
+          <Input
+            id="title"
+            placeholder="Enter task name..."
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="border-2"
+          />
         </div>
 
         <div className="space-y-4">
@@ -72,8 +85,8 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(d) => d && setDate(d)}
-                  disabled={(d) => d < new Date(new Date().setHours(0,0,0,0))}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                   className="pointer-events-auto"
                 />
