@@ -4,12 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Plus, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase"; // ← ДОБАВЬ
 
 interface AddTaskFormProps {
   onAdd: (task: {
@@ -24,34 +27,24 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
 
-  const handleSubmit = async (e: React.FormEvent) => { // ← async
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!title.trim()) {
       toast.error("Please enter a task title");
       return;
     }
 
-    const payload = {
+    onAdd({
       title,
       deadline: format(date, "yyyy-MM-dd"),
       importance,
-      status: "todo", // опционально
-    };
-
-    // Пишем в Supabase
-    const { error } = await supabase.from("tasks").insert(payload);
-    if (error) {
-      toast.error("Supabase error: " + error.message);
-      return;
-    }
-
-    // Локальный колбэк оставляем как было (если нужен)
-    onAdd?.(payload);
+    });
 
     setTitle("");
     setDate(new Date());
     setImportance(5);
-    toast.success("Task added to Supabase");
+    toast.success("Task added successfully!");
   };
 
   return (
@@ -63,7 +56,7 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
             id="title"
             placeholder="Enter task name..."
             value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
             className="border-2"
           />
         </div>
@@ -75,7 +68,10 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}
+                  className={cn(
+                    "w-full justify-start text-left font-normal border-2",
+                    !date && "text-muted-foreground"
+                  )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -86,7 +82,9 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => newDate && setDate(newDate)}
-                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  disabled={(d) =>
+                    d < new Date(new Date().setHours(0, 0, 0, 0))
+                  }
                   initialFocus
                   className="pointer-events-auto"
                 />
@@ -102,8 +100,18 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
               min="1"
               max="10"
               value={importance}
-              onChange={e => setImportance(Number(e.target.value))}
-              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0"
+              onChange={(e) => setImportance(Number(e.target.value))}
+              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer
+              [&::-webkit-slider-thumb]:appearance-none
+              [&::-webkit-slider-thumb]:w-5
+              [&::-webkit-slider-thumb]:h-5
+              [&::-webkit-slider-thumb]:rounded-full
+              [&::-webkit-slider-thumb]:bg-primary
+              [&::-moz-range-thumb]:w-5
+              [&::-moz-range-thumb]:h-5
+              [&::-moz-range-thumb]:rounded-full
+              [&::-moz-range-thumb]:bg-primary
+              [&::-moz-range-thumb]:border-0"
             />
           </div>
         </div>
