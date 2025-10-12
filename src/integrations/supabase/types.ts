@@ -14,33 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      task_table: {
-        Row: {
-          created_at: string
-          deadline: string
-          id: string
-          importance: number
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deadline: string
-          id?: string
-          importance: number
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deadline?: string
-          id?: string
-          importance?: number
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       tasks: {
         Row: {
           created_at: string

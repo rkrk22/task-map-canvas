@@ -35,13 +35,13 @@ export const TaskMap = () => {
     
     // Subscribe to realtime changes
     const channel = supabase
-      .channel("task-table-changes")
+      .channel("tasks-changes")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
-          table: "task_table",
+          table: "tasks",
         },
         () => {
           fetchTasks();
@@ -56,7 +56,7 @@ export const TaskMap = () => {
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
-      .from("task_table")
+      .from("tasks")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -103,7 +103,7 @@ export const TaskMap = () => {
     deadline: string;
     importance: number;
   }) => {
-    const { error } = await supabase.from("task_table").insert([task]);
+    const { error } = await supabase.from("tasks").insert([task]);
 
     if (error) {
       toast.error("Failed to add task");
@@ -122,7 +122,7 @@ export const TaskMap = () => {
       // Новая задача важнее - сдвигаем все конфликтующие задачи вниз (уменьшаем приоритет)
       for (const conflict of conflictDialog.conflicts) {
         await supabase
-          .from("task_table")
+          .from("tasks")
           .update({ importance: Math.max(1, conflict.importance - 1) })
           .eq("id", conflict.id);
       }
@@ -141,7 +141,7 @@ export const TaskMap = () => {
   };
 
   const handleDeleteTask = async (id: string) => {
-    const { error } = await supabase.from("task_table").delete().eq("id", id);
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
 
     if (error) {
       toast.error("Failed to delete task");
@@ -175,7 +175,7 @@ export const TaskMap = () => {
         
         for (const task of tasksToUpdate) {
           await supabase
-            .from("task_table")
+            .from("tasks")
             .update({ importance: task.importance })
             .eq("id", task.id);
         }
@@ -183,7 +183,7 @@ export const TaskMap = () => {
     }
 
     const { error } = await supabase
-      .from("task_table")
+      .from("tasks")
       .update(updates)
       .eq("id", id);
 
