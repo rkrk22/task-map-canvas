@@ -97,29 +97,35 @@ export const TaskMap = () => {
 
     await insertTask(task);
   };
-  
-const insertTask = async (task: { title: string; deadline: string; importance: number }) => {
-  const { data, error } = await supabase.from("tasks").insert([task]).select(); // ← вернуть вставленную строку
-  if (error) { toast.error("Failed to add task"); return; }
-  if (data && data[0]) setTasks(prev => [data[0], ...prev]);                   // ← мгновенно в UI
+  ////////////////////////
+
+  const insertTask = async (task: {
+  title: string;
+  deadline: string;
+  importance: number;
+}) => {
+  const { data, error } = await supabase
+    .from("tasks")
+    .insert([task])
+    .select(); // ← вернуть созданную запись
+
+  if (error) {
+    toast.error("Failed to add task");
+    console.error(error);
+    return;
+  }
+
+  if (data && data[0]) {
+    // 🔹 сразу добавляем новую задачу в UI
+    setTasks((prev) => [data[0], ...prev]);
+  }
+
   toast.success("Task added");
 };
 
-  const insertTask = async (task: {
-    title: string;
-    deadline: string;
-    importance: number;
-  }) => {
-    const { error } = await supabase.from("tasks").insert([task]);
 
-    if (error) {
-      toast.error("Failed to add task");
-      console.error(error);
-    } else {
-      toast.success("Task added");
-    }
-  };
-
+  
+////////////////////////////
   const handleResolveConflict = async (makePriority: boolean) => {
     if (!conflictDialog) return;
 
