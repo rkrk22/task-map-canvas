@@ -1,31 +1,105 @@
-// сверху: import { supabase } from "@/lib/supabase";
+// src/components/.../AddTaskForm.tsx
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, CalendarIcon } from "lucide-react";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase"; // ← добавь
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!title.trim()) {
-    toast.error("Please enter a task title");
-    return;
-  }
-  const payload = {
-    title,
-    deadline: format(date, "yyyy-MM-dd"),
-    importance,
+interface AddTaskFormProps {
+  onAdd: (task: { title: string; deadline: string; importance: number }) => void;
+}
+
+export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState<Date>(new Date());
+  const [importance, setImportance] = useState(5);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      toast.error("Please enter a task title");
+      return;
+    }
+    const payload = {
+      title,
+      deadline: format(date, "yyyy-MM-dd"),
+      importance,
+    };
+
+    // пишем ТОЛЬКО в Supabase → таблица public.tasks
+    const { error } = await supabase.from("tasks").insert(payload);
+    if (error) {
+      toast.error("Supabase: " + error.message);
+      return;
+    }
+
+    onAdd?.(payload); // можно оставить для локального обновления UI
+    setTitle("");
+    setDate(new Date());
+    setImportance(5);
+    toast.success("Task added to Supabase");
   };
 
-  const { data, error } = await supabase
-    .from("tasks")
-    .insert(payload)
-    .select()
-    .single();
+  return (
+    <Card className="mb-8 border-2 p-6 bg-gray-50">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">Task Title</Label>
+          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" />
+        </div>
 
-  if (error) {
-    toast.error("Supabase: " + error.message);
-    return;
-  }
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Due Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(d) => d && setDate(d)}
+                  disabled={(d) => d < new Date(new Date().setHours(0,0,0,0))}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-  onAdd?.(data); // передаём созданную запись, а не payload
-  setTitle("");
-  setDate(new Date());
-  setImportance(5);
-  toast.success("Task added to Supabase");
+          <div className="space-y-2">
+            <Label htmlFor="importance">Importance: {importance}/10</Label>
+            <input
+              id="importance"
+              type="range"
+              min="1"
+              max="10"
+              value={importance}
+              onChange={e => setImportance(Number(e.target.value))}
+              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0"
+            />
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full" size="lg">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Task
+        </Button>
+      </form>
+    </Card>
+  );
 };
