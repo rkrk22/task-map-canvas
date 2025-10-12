@@ -99,18 +99,17 @@ export const TaskMap = () => {
   };
   ////////////////////////
 
-const insertTask = async (task: { title:string; deadline:string; importance:number }) => {
-  const { error } = await supabase.from("tasks").insert(task); // без .select()
-
+const insertTask = async (task: { title: string; deadline: string; importance: number }) => {
+  const { error } = await supabase.from("tasks").insert(task); // .insert([task]) тоже можно
   if (error) {
     toast.error("Failed to add task");
     console.error(error);
     return;
   }
-
-  await fetchTasks();           // ← подтянуть свежие данные из БД
+  await fetchTasks();              // ← подтянуть свежий список задач
   toast.success("Task added");
 };
+
 
 
   
