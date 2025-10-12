@@ -4,16 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
 interface AddTaskFormProps {
   onAdd: (task: {
     title: string;
@@ -21,44 +16,33 @@ interface AddTaskFormProps {
     importance: number;
   }) => void;
 }
-
-export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
+export const AddTaskForm = ({
+  onAdd
+}: AddTaskFormProps) => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!title.trim()) {
       toast.error("Please enter a task title");
       return;
     }
-
     onAdd({
       title,
       deadline: format(date, "yyyy-MM-dd"),
-      importance,
+      importance
     });
-
     setTitle("");
     setDate(new Date());
     setImportance(5);
     toast.success("Task added successfully!");
   };
-
-  return (
-    <Card className="mb-8 border-2 p-6 bg-gray-50">
+  return <Card className="mb-8 border-2 p-6 bg-gray-50">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
-          <Input
-            id="title"
-            placeholder="Enter task name..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border-2"
-          />
+          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" />
         </div>
 
         <div className="space-y-4">
@@ -82,9 +66,7 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => newDate && setDate(newDate)}
-                  disabled={(d) =>
-                    d < new Date(new Date().setHours(0, 0, 0, 0))
-                  }
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                   className="pointer-events-auto"
                 />
@@ -93,25 +75,17 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="importance">Importance: {importance}/10</Label>
+            <Label htmlFor="importance">
+              Importance: {importance}/10
+            </Label>
             <input
               id="importance"
               type="range"
               min="1"
               max="10"
               value={importance}
-              onChange={(e) => setImportance(Number(e.target.value))}
-              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer
-              [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-5
-              [&::-webkit-slider-thumb]:h-5
-              [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-primary
-              [&::-moz-range-thumb]:w-5
-              [&::-moz-range-thumb]:h-5
-              [&::-moz-range-thumb]:rounded-full
-              [&::-moz-range-thumb]:bg-primary
-              [&::-moz-range-thumb]:border-0"
+              onChange={e => setImportance(Number(e.target.value))}
+              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0"
             />
           </div>
         </div>
@@ -121,6 +95,5 @@ export const AddTaskForm = ({ onAdd }: AddTaskFormProps) => {
           Add Task
         </Button>
       </form>
-    </Card>
-  );
+    </Card>;
 };
