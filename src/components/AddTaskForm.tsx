@@ -42,7 +42,7 @@ export const AddTaskForm = ({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
-          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" />
+          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" autoComplete="off" />
         </div>
 
         <div className="space-y-4">

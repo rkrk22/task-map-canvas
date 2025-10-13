@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import characterImage from "@/assets/character.png";
 
 function WebhookBubble() {
   const [text, setText] = useState("Загрузка...");
@@ -31,9 +32,21 @@ function WebhookBubble() {
   }, []);
 
   return (
-    <div className="fixed left-4 bottom-4 bg-white text-black p-3 rounded-2xl shadow-lg z-50 border border-gray-200">
-      {text}
-    </div>
+    <>
+      {/* Character */}
+      <div className="fixed left-4 bottom-4 z-50">
+        <img src={characterImage} alt="Assistant character" className="h-[120px] w-auto" />
+      </div>
+
+      {/* Bubble */}
+      <div className="fixed left-4 bottom-32 z-50 max-w-[240px]">
+        <div className="relative bg-white text-black p-3 rounded-2xl shadow-lg border border-gray-200" style={{ wordWrap: "break-word" }}>
+          {text}
+          {/* Triangle tail pointing down */}
+          <div className="absolute -bottom-2 left-4 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white" />
+        </div>
+      </div>
+    </>
   );
 }
 
