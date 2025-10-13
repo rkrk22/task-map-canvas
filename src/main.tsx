@@ -35,7 +35,7 @@ function WebhookBubble() {
     <>
       {/* Character */}
       <div className="fixed left-12 bottom-4 z-50">
-        <img src={characterImage} alt="Assistant character" className="h-[120px] w-auto" />
+        <img src={characterImage} alt="Assistant character" className="h-[120px] w-[120px] rounded-full object-cover" />
       </div>
 
       {/* Bubble */}
