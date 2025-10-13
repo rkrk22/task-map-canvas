@@ -15,7 +15,7 @@ export function TaskSidebar({
       
       
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="mx-0 px-[22px]">
           <SidebarGroupLabel>New Task</SidebarGroupLabel>
           <SidebarGroupContent>
             <AddTaskForm onAdd={onAdd} />
