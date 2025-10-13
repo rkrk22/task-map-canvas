@@ -37,7 +37,7 @@ function WebhookBubble() {
   return (
     <>
       {/* Character Sprite */}
-      <div className="fixed left-12 bottom-4 z-50">
+      <div className="fixed left-12 bottom-4 z-50 rounded-full overflow-hidden" style={{ width: "120px", height: "120px" }}>
         <CharacterSprite
           src={spriteSheet}
           frameW={300}
@@ -51,7 +51,7 @@ function WebhookBubble() {
 
       {/* Bubble - only render if text exists */}
       {isBubbleVisible && (
-        <div className="fixed left-12 bottom-[325px] z-50 max-w-[240px]">
+        <div className="fixed left-12 bottom-[140px] z-50 max-w-[240px]">
           <div className="relative bg-white text-black p-3 rounded-2xl shadow-lg border border-gray-200" style={{ wordWrap: "break-word" }}>
             {text}
             {/* Triangle tail pointing down */}

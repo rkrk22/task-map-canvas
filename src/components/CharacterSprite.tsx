@@ -33,7 +33,7 @@ export default function CharacterSprite({
       return;
     }
 
-    const frameDuration = 1000 / fps;
+    const getRandomDuration = () => 100 + Math.random() * 50; // 100-150ms
 
     const animate = (timestamp: number) => {
       if (!lastFrameTimeRef.current) {
@@ -41,9 +41,10 @@ export default function CharacterSprite({
       }
 
       const elapsed = timestamp - lastFrameTimeRef.current;
+      const frameDuration = getRandomDuration();
 
       if (elapsed >= frameDuration) {
-        setFrameIndex((prev) => (prev + 1) % frames);
+        setFrameIndex(Math.floor(Math.random() * frames)); // Random frame
         lastFrameTimeRef.current = timestamp;
       }
 
@@ -58,7 +59,7 @@ export default function CharacterSprite({
       }
       lastFrameTimeRef.current = 0;
     };
-  }, [playing, fps, frames]);
+  }, [playing, frames]);
 
   const row = Math.floor(frameIndex / columns);
   const col = frameIndex % columns;
