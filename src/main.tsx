@@ -39,7 +39,7 @@ function WebhookBubble() {
       </div>
 
       {/* Bubble */}
-      <div className="fixed left-4 bottom-32 z-50 max-w-[240px]">
+      <div className="fixed left-12 bottom-32 z-50 max-w-[240px]">
         <div className="relative bg-white text-black p-3 rounded-2xl shadow-lg border border-gray-200" style={{ wordWrap: "break-word" }}>
           {text}
           {/* Triangle tail pointing down */}
