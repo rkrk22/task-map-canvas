@@ -22,27 +22,40 @@ export default function CharacterSprite({
   const [frameIndex, setFrameIndex] = useState(0);
   const aspectRatio = frameW / frameH;
   const width = height * aspectRatio;
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Когда анимация выключается — сбрасываем кадр и очищаем таймер
     if (!playing) {
       setFrameIndex(0);
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
       return;
     }
 
     const animate = () => {
-      // Random frame (excluding current frame for variation)
+      // Выбираем случайный кадр, отличный от текущего
       setFrameIndex((prev) => {
-        const availableFrames = Array.from({ length: frames }, (_, i) => i).filter(i => i !== prev);
+        const availableFrames = Array.from({ length: frames }, (_, i) => i).filter((i) => i !== prev);
         return availableFrames[Math.floor(Math.random() * availableFrames.length)];
       });
-      
-      // Random interval between 100-150ms
+
+      // Случайная задержка между кадрами
       const randomDelay = 100 + Math.random() * 50;
-      return setTimeout(animate, randomDelay);
+      timeoutRef.current = window.setTimeout(animate, randomDelay);
     };
 
-    const timeoutId = animate();
-    return () => clearTimeout(timeoutId);
+    animate();
+
+    // Очистка при размонтировании или смене состояния
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
   }, [playing, frames]);
 
   const row = Math.floor(frameIndex / columns);
@@ -55,7 +68,7 @@ export default function CharacterSprite({
         height: `${height}px`,
         borderRadius: "50%",
         overflow: "hidden",
-        position: "relative",
+        position: "relative`,
       }}
     >
       <div
@@ -65,7 +78,7 @@ export default function CharacterSprite({
           backgroundImage: `url(${src})`,
           backgroundPosition: `-${col * width}px -${row * height}px`,
           backgroundSize: `${columns * width}px ${Math.ceil(frames / columns) * height}px`,
-          backgroundRepeat: "no-repeat",
+          backgroundRepeat: "no-repeat`,
         }}
       />
     </div>
