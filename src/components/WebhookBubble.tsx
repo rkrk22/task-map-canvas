@@ -4,37 +4,43 @@ import CharacterSprite from "@/components/CharacterSprite";
 
 export default function WebhookBubble() {
   const [text, setText] = useState("");
+  const [isBubbleVisible, setIsBubbleVisible] = useState(false);
+
+  const handleCharacterClick = async () => {
+    try {
+      const res = await fetch("https://n8n-my35.onrender.com/webhook/assistant-bubble");
+      if (!res.ok) throw new Error("Ошибка запроса");
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        setText(data.message || data.text || JSON.stringify(data));
+      } else {
+        const t = await res.text();
+        setText(t.trim() || "");
+      }
+      setIsBubbleVisible(true);
+    } catch (e) {
+      console.error(e);
+      setText("");
+    }
+  };
 
   useEffect(() => {
-    async function fetchText() {
-      try {
-        const res = await fetch("https://n8n-my35.onrender.com/webhook/assistant-bubble");
-        if (!res.ok) throw new Error("Ошибка запроса");
-        const contentType = res.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const data = await res.json();
-          setText(data.message || data.text || JSON.stringify(data));
-        } else {
-          const t = await res.text();
-          setText(t.trim() || "");
-        }
-      } catch (e) {
-        console.error(e);
-        setText("");
-      }
+    if (isBubbleVisible) {
+      const timer = setTimeout(() => {
+        setIsBubbleVisible(false);
+      }, 12000);
+      return () => clearTimeout(timer);
     }
-
-    fetchText();
-    const id = setInterval(fetchText, 20000);
-    return () => clearInterval(id);
-  }, []);
-
-  const isBubbleVisible = !!text;
+  }, [isBubbleVisible]);
 
   return (
     <>
       {/* Character */}
-      <div className="fixed left-12 bottom-4 z-50">
+      <div 
+        className="fixed left-12 bottom-4 z-50 cursor-pointer" 
+        onClick={handleCharacterClick}
+      >
         <CharacterSprite
           src={spriteSheet}
           frameW={267}
