@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface CharacterSpriteProps {
   src: string;
@@ -22,37 +22,39 @@ export default function CharacterSprite({
   const [frameIndex, setFrameIndex] = useState(0);
   const aspectRatio = frameW / frameH;
   const width = height * aspectRatio;
+
+  // Храним ТОЛЬКО один активный таймер
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Когда анимация выключается — сбрасываем кадр и очищаем таймер
+    // Всегда чистим висящий таймер при входе в эффект
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
     if (!playing) {
-      setFrameIndex(0);
-      if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      setFrameIndex(0); // стоп на первом кадре
       return;
     }
 
     const animate = () => {
-      // Выбираем случайный кадр, отличный от текущего
+      // следующий кадр (отличный от текущего)
       setFrameIndex((prev) => {
-        const availableFrames = Array.from({ length: frames }, (_, i) => i).filter((i) => i !== prev);
-        return availableFrames[Math.floor(Math.random() * availableFrames.length)];
+        const available = Array.from({ length: frames }, (_, i) => i).filter(i => i !== prev);
+        return available[Math.floor(Math.random() * available.length)];
       });
 
-      // Случайная задержка между кадрами
-      const randomDelay = 100 + Math.random() * 50;
-      timeoutRef.current = window.setTimeout(animate, randomDelay);
+      const delay = 100 + Math.random() * 50;
+      timeoutRef.current = window.setTimeout(animate, delay);
     };
 
     animate();
 
-    // Очистка при размонтировании или смене состояния
+    // Чистка при выключении playing/размонтировании
     return () => {
       if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current);
+        window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
     };
@@ -68,7 +70,7 @@ export default function CharacterSprite({
         height: `${height}px`,
         borderRadius: "50%",
         overflow: "hidden",
-        position: "relative`,
+        position: "relative",
       }}
     >
       <div
@@ -78,7 +80,7 @@ export default function CharacterSprite({
           backgroundImage: `url(${src})`,
           backgroundPosition: `-${col * width}px -${row * height}px`,
           backgroundSize: `${columns * width}px ${Math.ceil(frames / columns) * height}px`,
-          backgroundRepeat: "no-repeat`,
+          backgroundRepeat: "no-repeat",
         }}
       />
     </div>
