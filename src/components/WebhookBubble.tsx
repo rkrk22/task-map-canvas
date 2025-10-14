@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import spriteSheet from "@/assets/sprite_animation_small_2.png";
 import CharacterSprite from "@/components/CharacterSprite";
+import { Loader2 } from "lucide-react";
 
 export default function WebhookBubble() {
   const [text, setText] = useState("");
   const [isBubbleVisible, setIsBubbleVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCharacterClick = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch("https://n8n-my35.onrender.com/webhook/assistant-bubble");
       if (!res.ok) throw new Error("Ошибка запроса");
@@ -18,10 +21,12 @@ export default function WebhookBubble() {
         const t = await res.text();
         setText(t.trim() || "");
       }
+      setIsLoading(false);
       setIsBubbleVisible(true);
     } catch (e) {
       console.error(e);
       setText("");
+      setIsLoading(false);
     }
   };
 
@@ -48,12 +53,21 @@ export default function WebhookBubble() {
           frames={9}
           columns={3}
           height={120}
-          playing={isBubbleVisible}
+          playing={isBubbleVisible || isLoading}
         />
       </div>
 
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="fixed left-12 bottom-32 z-50">
+          <div className="bg-white p-3 rounded-full shadow-lg border border-gray-200">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        </div>
+      )}
+
       {/* Bubble */}
-      {isBubbleVisible && (
+      {isBubbleVisible && !isLoading && (
         <div className="fixed left-12 bottom-32 z-50 max-w-[240px]">
           <div className="relative bg-white text-black p-3 rounded-2xl shadow-lg border border-gray-200" style={{ wordWrap: "break-word" }}>
             {text}
