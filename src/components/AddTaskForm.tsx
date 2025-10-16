@@ -38,7 +38,7 @@ export const AddTaskForm = ({
     setImportance(5);
     toast.success("Task added successfully!");
   };
-  return <Card className="mb-8 border-2 p-6 bg-gray-50">
+  return <Card className="mb-8 border-2 p-6 bg-[#fefaef]">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
@@ -50,26 +50,13 @@ export const AddTaskForm = ({
             <Label>Due Date</Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal border-2",
-                    !date && "text-muted-foreground"
-                  )}
-                >
+                <Button variant="outline" className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(newDate) => newDate && setDate(newDate)}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
+                <Calendar mode="single" selected={date} onSelect={newDate => newDate && setDate(newDate)} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
               </PopoverContent>
             </Popover>
           </div>
@@ -78,15 +65,7 @@ export const AddTaskForm = ({
             <Label htmlFor="importance">
               Importance: {importance}/10
             </Label>
-            <input
-              id="importance"
-              type="range"
-              min="1"
-              max="10"
-              value={importance}
-              onChange={e => setImportance(Number(e.target.value))}
-              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0"
-            />
+            <input id="importance" type="range" min="1" max="10" value={importance} onChange={e => setImportance(Number(e.target.value))} className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0" />
           </div>
         </div>
 
