@@ -71,7 +71,7 @@ export default function WebhookBubble() {
           frames={9}
           columns={3}
           height={120}
-          playing={isBubbleVisible || isLoading}
+          playing={isBubbleVisible}
         />
       </div>
 

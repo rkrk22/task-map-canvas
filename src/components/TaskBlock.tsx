@@ -31,7 +31,8 @@ export const TaskBlock = ({
   const iconSize = Math.max(10, Math.min(scaledSize / 15, 14));
   const padding = Math.max(8, Math.min(scaledSize / 10, 16));
   
-  const gradientIndex = importance > 5 ? 1 : 2;
+  // Map importance to gradient colors (1-6 to match reference palette)
+  const gradientIndex = Math.min(6, Math.max(1, Math.ceil((importance / 10) * 6)));
 
   return (
     <motion.div
