@@ -23,7 +23,9 @@ export const TaskBlock = ({
   onDelete,
 }: TaskBlockProps) => {
   const baseSize = 60;
-  const scaledSize = baseSize + (size * 15);
+  // Increase base size for low importance tasks (1/10)
+  const importanceBoost = importance === 1 ? 15 : 0;
+  const scaledSize = baseSize + importanceBoost + (size * 15);
   
   // Dynamic font sizes based on card size
   const titleFontSize = Math.max(10, Math.min(scaledSize / 8, 16));

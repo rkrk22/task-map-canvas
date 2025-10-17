@@ -199,7 +199,10 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full gap-6 p-6">
-        <TaskSidebar onAdd={handleAddTask} />
+        {/* Desktop sidebar */}
+        <div className="hidden md:block">
+          <TaskSidebar onAdd={handleAddTask} />
+        </div>
         
         <main className="flex-1 bg-background">
           <div className="mx-auto max-w-7xl">
@@ -208,6 +211,11 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
               <p className="text-muted-foreground">
                 Visualize your tasks by priority and deadline
               </p>
+            </div>
+
+            {/* Mobile task creation form */}
+            <div className="md:hidden mb-6">
+              <TaskSidebar onAdd={handleAddTask} />
             </div>
 
             <div className="flex flex-wrap gap-6 rounded-2xl border-2 border-border bg-muted/20 p-8">
