@@ -21,6 +21,20 @@ export default function WebhookBubble() {
     };
   }, []);
 
+  useEffect(() => {
+    const handleShowMessage = (event: any) => {
+      const { message } = event.detail;
+      setText(message);
+      setIsBubbleVisible(true);
+      restartHideTimer();
+    };
+
+    window.addEventListener("show-character-message", handleShowMessage);
+    return () => {
+      window.removeEventListener("show-character-message", handleShowMessage);
+    };
+  }, []);
+
   const restartHideTimer = () => {
     if (hideTimerRef.current) {
       clearTimeout(hideTimerRef.current);

@@ -122,13 +122,14 @@ export const TaskBlock = ({
       className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
       onClick={onClick}
       style={{
-        width: `${Math.min(scaledSize, 200)}px`,
-        height: `${Math.min(scaledSize, 200)}px`,
+        width: isDragging ? `${Math.min(scaledSize, 200)}px` : `${Math.min(scaledSize, 200)}px`,
+        height: isDragging ? `${Math.min(scaledSize, 200)}px` : `${Math.min(scaledSize, 200)}px`,
         background: `var(--task-gradient-${gradientIndex})`,
         padding: `${padding}px`,
         transform: isDragging ? `translate(${position.x}px, ${position.y}px)` : undefined,
         transition: isDragging ? "none" : "transform 0.3s ease-out",
         opacity: isDone ? 0.6 : 1,
+        borderRadius: isDragging ? "0.5rem" : "0.75rem",
       }}
       draggable
       onDragStart={handleDragStart as any}
@@ -138,36 +139,42 @@ export const TaskBlock = ({
       onTouchMove={handleDrag as any}
       onTouchEnd={handleDragEnd as any}
     >
-      <div className="flex h-full flex-col justify-between text-gray-700">
-        <div className="flex items-start justify-between gap-2">
-          <h3 
-            className="line-clamp-3 font-semibold flex-1"
-            style={{ 
-              fontSize: `${titleFontSize}px`,
-              textDecoration: isDone ? "line-through" : "none"
-            }}
-          >
-            {title}
-          </h3>
-          {isDone && (
-            <div className="flex-shrink-0 bg-green-500 rounded-full p-1">
-              <Check style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="text-white" />
-            </div>
-          )}
+      {isDragging ? (
+        <div className="flex h-full items-center justify-center">
+          <span className="text-gray-700 font-bold text-lg">done?</span>
         </div>
-        
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
-            <Calendar style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
-            <span>{format(new Date(deadline), "MMM d")}</span>
+      ) : (
+        <div className="flex h-full flex-col justify-between text-gray-700">
+          <div className="flex items-start justify-between gap-2">
+            <h3 
+              className="line-clamp-3 font-semibold flex-1"
+              style={{ 
+                fontSize: `${titleFontSize}px`,
+                textDecoration: isDone ? "line-through" : "none"
+              }}
+            >
+              {title}
+            </h3>
+            {isDone && (
+              <div className="flex-shrink-0 bg-green-500 rounded-full p-1">
+                <Check style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="text-white" />
+              </div>
+            )}
           </div>
           
-          <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
-            <Star style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="fill-current" />
-            <span>{importance}/10</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
+              <Calendar style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
+              <span>{format(new Date(deadline), "MMM d")}</span>
+            </div>
+            
+            <div className="flex items-center gap-1 opacity-80" style={{ fontSize: `${detailFontSize}px` }}>
+              <Star style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="fill-current" />
+              <span>{importance}/10</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       
       <Button
         size="icon"

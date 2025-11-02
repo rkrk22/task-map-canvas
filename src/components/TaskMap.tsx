@@ -74,6 +74,16 @@ export const TaskMap = () => {
       const burstId = particleIdRef.current++;
       setParticleBursts(prev => [...prev, { id: burstId, x: event.detail.x, y: event.detail.y }]);
 
+      const messages = [
+        "Finally",
+        "Could be faster",
+        "Guess we're not in a hurry😑",
+        "Good job, now let's get coffee☕️",
+        "Well done, now coffee time"
+      ];
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      window.dispatchEvent(new CustomEvent("show-character-message", { detail: { message: randomMessage } }));
+
       const { error } = await supabase
         .from("tasks")
         .update({ status: "done" })
