@@ -102,7 +102,7 @@ export const TaskBlock = ({
         clientY <= rect.bottom;
 
       if (isOverCharacter) {
-        window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id } }));
+        window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id, x: clientX, y: clientY } }));
       }
     }
 
@@ -118,7 +118,6 @@ export const TaskBlock = ({
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
-      whileHover={{ scale: 1.05, transition: { duration: 0.15 } }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
       onClick={onClick}

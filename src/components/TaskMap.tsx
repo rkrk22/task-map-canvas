@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { TaskBlock } from "./TaskBlock";
 import { TaskSidebar } from "./TaskSidebar";
 import { EditTaskDialog } from "./EditTaskDialog";
 import { toast } from "sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { ParticleBurst } from "./ParticleBurst";
+import taskDoneSound from "@/assets/task_done_sound.wav";
 import {
   Dialog,
   DialogContent,
@@ -30,8 +32,12 @@ export const TaskMap = () => {
     conflicts: Task[];
   } | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [particleBursts, setParticleBursts] = useState<{ id: number; x: number; y: number }[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const particleIdRef = useRef(0);
 
   useEffect(() => {
+    audioRef.current = new Audio(taskDoneSound);
     fetchTasks();
     
     const channel = supabase
@@ -50,7 +56,7 @@ export const TaskMap = () => {
       .subscribe();
 
     const handleTaskDrop = async (e: Event) => {
-      const event = e as CustomEvent<{ taskId: string }>;
+      const event = e as CustomEvent<{ taskId: string; x: number; y: number }>;
       const taskId = event.detail.taskId;
       
       const originalTask = tasks.find(t => t.id === taskId);
@@ -59,6 +65,14 @@ export const TaskMap = () => {
       setTasks(prev => 
         prev.map(t => t.id === taskId ? { ...t, status: "done" } : t)
       );
+
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(console.error);
+      }
+
+      const burstId = particleIdRef.current++;
+      setParticleBursts(prev => [...prev, { id: burstId, x: event.detail.x, y: event.detail.y }]);
 
       const { error } = await supabase
         .from("tasks")
@@ -328,6 +342,15 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
         onClose={() => setEditingTask(null)}
         onUpdate={handleUpdateTask}
       />
+
+      {particleBursts.map((burst) => (
+        <ParticleBurst
+          key={burst.id}
+          x={burst.x}
+          y={burst.y}
+          onComplete={() => setParticleBursts(prev => prev.filter(b => b.id !== burst.id))}
+        />
+      ))}
     </SidebarProvider>
   );
 };
