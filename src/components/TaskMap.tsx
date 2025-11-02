@@ -20,6 +20,7 @@ interface Task {
   title: string;
   deadline: string;
   importance: number;
+  status: string;
 }
 
 export const TaskMap = () => {
@@ -33,7 +34,6 @@ export const TaskMap = () => {
   useEffect(() => {
     fetchTasks();
     
-    // Subscribe to realtime changes
     const channel = supabase
       .channel("tasks-changes")
       .on(
@@ -49,10 +49,40 @@ export const TaskMap = () => {
       )
       .subscribe();
 
+    const handleTaskDrop = async (e: Event) => {
+      const event = e as CustomEvent<{ taskId: string }>;
+      const taskId = event.detail.taskId;
+      
+      const originalTask = tasks.find(t => t.id === taskId);
+      if (!originalTask || originalTask.status === "done") return;
+
+      setTasks(prev => 
+        prev.map(t => t.id === taskId ? { ...t, status: "done" } : t)
+      );
+
+      const { error } = await supabase
+        .from("tasks")
+        .update({ status: "done" })
+        .eq("id", taskId);
+
+      if (error) {
+        console.error("Failed to update task status:", error);
+        setTasks(prev => 
+          prev.map(t => t.id === taskId ? { ...t, status: originalTask.status } : t)
+        );
+        toast.error("Failed to mark task as done");
+      } else {
+        toast.success("Task completed!");
+      }
+    };
+
+    window.addEventListener("task-dropped", handleTaskDrop);
+
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener("task-dropped", handleTaskDrop);
     };
-  }, []);
+  }, [tasks]);
 
   const fetchTasks = async () => {
     const { data, error } = await supabase
@@ -233,6 +263,7 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
                     title={task.title}
                     deadline={task.deadline}
                     importance={task.importance}
+                    status={task.status}
                     size={calculateSize(task.deadline, task.importance)}
                     onClick={() => setEditingTask(task)}
                     onDelete={handleDeleteTask}

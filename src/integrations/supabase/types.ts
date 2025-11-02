@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      tasks: {
+      task_table: {
         Row: {
           created_at: string
           deadline: string
@@ -36,6 +36,36 @@ export type Database = {
           deadline?: string
           id?: string
           importance?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          deadline: string
+          id: string
+          importance: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deadline: string
+          id?: string
+          importance: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string
+          id?: string
+          importance?: number
+          status?: string
           title?: string
           updated_at?: string
         }

@@ -57,12 +57,18 @@ export default function WebhookBubble() {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
   return (
     <>
-      {/* Character */}
       <div
+        id="character-drop-zone"
         className="fixed left-12 bottom-4 z-50 cursor-pointer"
         onClick={handleCharacterClick}
+        onDragOver={handleDragOver}
       >
         <CharacterSprite
           src={spriteSheet}
