@@ -31,7 +31,6 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
-  const [calendarOpen, setCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -50,13 +49,9 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
     }
 
     if (task) {
-      // Close dialog and show toast immediately
-      const updates = { title, deadline: format(date, "yyyy-MM-dd"), importance };
+      onUpdate(task.id, { title, deadline: format(date, "yyyy-MM-dd"), importance });
       onClose();
       toast.success("Task updated");
-      
-      // Call onUpdate after UI update
-      onUpdate(task.id, updates);
     }
   };
 
@@ -83,7 +78,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
 
           <div>
             <Label>Due Date</Label>
-            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -100,12 +95,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(newDate) => {
-                    if (newDate) {
-                      setDate(newDate);
-                      setCalendarOpen(false);
-                    }
-                  }}
+                  onSelect={(newDate) => newDate && setDate(newDate)}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                   className="pointer-events-auto"
