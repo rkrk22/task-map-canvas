@@ -22,21 +22,27 @@ export const AddTaskForm = ({
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
       toast.error("Please enter a task title");
       return;
     }
-    onAdd({
+    
+    // Reset form immediately for no lag
+    const taskData = {
       title,
       deadline: format(date, "yyyy-MM-dd"),
       importance
-    });
+    };
     setTitle("");
     setDate(new Date());
     setImportance(5);
     toast.success("Task added successfully!");
+    
+    // Call onAdd after UI update
+    onAdd(taskData);
   };
   return <Card className="mb-8 border-2 p-6 bg-[#fefaef]">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -48,7 +54,7 @@ export const AddTaskForm = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Due Date</Label>
-            <Popover>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -56,7 +62,19 @@ export const AddTaskForm = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={date} onSelect={newDate => newDate && setDate(newDate)} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
+                <Calendar 
+                  mode="single" 
+                  selected={date} 
+                  onSelect={(newDate) => {
+                    if (newDate) {
+                      setDate(newDate);
+                      setCalendarOpen(false);
+                    }
+                  }} 
+                  disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} 
+                  initialFocus 
+                  className="pointer-events-auto" 
+                />
               </PopoverContent>
             </Popover>
           </div>
