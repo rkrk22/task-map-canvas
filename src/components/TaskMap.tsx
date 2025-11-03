@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { TaskBlock } from "./TaskBlock";
 import { TaskSidebar } from "./TaskSidebar";
 import { EditTaskDialog } from "./EditTaskDialog";
@@ -15,45 +14,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, ArrowDown } from "lucide-react";
-
-interface Task {
-  id: string;
-  title: string;
-  deadline: string;
-  importance: number;
-  status: string;
-}
+import { ArrowUp, ArrowDown, Wifi, WifiOff } from "lucide-react";
+import { useTasks } from "@/hooks/useTasks";
+import { LocalTask } from "@/lib/db";
 
 export const TaskMap = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, isOnline, createTask, updateTask, deleteTask, retryFailedTask } = useTasks();
   const [conflictDialog, setConflictDialog] = useState<{
     newTask: { title: string; deadline: string; importance: number };
-    conflicts: Task[];
+    conflicts: LocalTask[];
   } | null>(null);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<LocalTask | null>(null);
   const [particleBursts, setParticleBursts] = useState<{ id: number; x: number; y: number }[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const particleIdRef = useRef(0);
 
   useEffect(() => {
     audioRef.current = new Audio(taskDoneSound);
-    fetchTasks();
-    
-    const channel = supabase
-      .channel("tasks-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "tasks",
-        },
-        () => {
-          fetchTasks();
-        }
-      )
-      .subscribe();
 
     const handleTaskDrop = async (e: Event) => {
       const event = e as CustomEvent<{ taskId: string; x: number; y: number }>;
@@ -61,10 +38,6 @@ export const TaskMap = () => {
       
       const originalTask = tasks.find(t => t.id === taskId);
       if (!originalTask || originalTask.status === "done") return;
-
-      setTasks(prev => 
-        prev.map(t => t.id === taskId ? { ...t, status: "done" } : t)
-      );
 
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
@@ -84,44 +57,17 @@ export const TaskMap = () => {
       const randomMessage = messages[Math.floor(Math.random() * messages.length)];
       window.dispatchEvent(new CustomEvent("show-character-message", { detail: { message: randomMessage } }));
 
-      const { error } = await supabase
-        .from("tasks")
-        .update({ status: "done" })
-        .eq("id", taskId);
-
-      if (error) {
-        console.error("Failed to update task status:", error);
-        setTasks(prev => 
-          prev.map(t => t.id === taskId ? { ...t, status: originalTask.status } : t)
-        );
-        toast.error("Failed to mark task as done");
-      } else {
-        toast.success("Task completed!");
-      }
+      await updateTask(taskId, { status: "done" });
+      toast.success("Task completed!");
     };
 
     window.addEventListener("task-dropped", handleTaskDrop);
 
     return () => {
-      supabase.removeChannel(channel);
       window.removeEventListener("task-dropped", handleTaskDrop);
     };
-  }, [tasks]);
+  }, [tasks, updateTask]);
 
-  const fetchTasks = async () => {
-    const { data, error } = await supabase
-      .from("tasks")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast.error("Failed to load tasks");
-      console.error(error);
-      return;
-    }
-
-    setTasks(data || []);
-  };
 
   const calculateSize = (deadline: string, importance: number): number => {
     const today = new Date();
@@ -151,18 +97,11 @@ export const TaskMap = () => {
 
     await insertTask(task);
   };
-  ////////////////////////
 
-const insertTask = async (task: { title: string; deadline: string; importance: number }) => {
-  const { error } = await supabase.from("tasks").insert(task); // .insert([task]) тоже можно
-  if (error) {
-    toast.error("Failed to add task");
-    console.error(error);
-    return;
-  }
-  await fetchTasks();              // ← подтянуть свежий список задач
-  toast.success("Task added");
-};
+  const insertTask = async (task: { title: string; deadline: string; importance: number }) => {
+    await createTask(task);
+    toast.success("Task added");
+  };
 
 
 
@@ -176,10 +115,9 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
     if (makePriority) {
       // Новая задача важнее - сдвигаем все конфликтующие задачи вниз (уменьшаем приоритет)
       for (const conflict of conflictDialog.conflicts) {
-        await supabase
-          .from("tasks")
-          .update({ importance: Math.max(1, conflict.importance - 1) })
-          .eq("id", conflict.id);
+        await updateTask(conflict.id, { 
+          importance: Math.max(1, conflict.importance - 1) 
+        });
       }
       // Добавляем новую задачу с исходным приоритетом
       await insertTask(newTask);
@@ -196,14 +134,8 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
   };
 
   const handleDeleteTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").delete().eq("id", id);
-
-    if (error) {
-      toast.error("Failed to delete task");
-      console.error(error);
-    } else {
-      toast.success("Task deleted");
-    }
+    await deleteTask(id);
+    toast.success("Task deleted");
   };
 
   const handleUpdateTask = async (
@@ -229,25 +161,13 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
           }));
         
         for (const task of tasksToUpdate) {
-          await supabase
-            .from("tasks")
-            .update({ importance: task.importance })
-            .eq("id", task.id);
+          await updateTask(task.id, { importance: task.importance });
         }
       }
     }
 
-    const { error } = await supabase
-      .from("tasks")
-      .update(updates)
-      .eq("id", id);
-
-    if (error) {
-      toast.error("Failed to update task");
-      console.error(error);
-    } else {
-      toast.success("Task updated");
-    }
+    await updateTask(id, updates);
+    toast.success("Task updated");
   };
 
   return (
@@ -261,10 +181,24 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
         <main className="flex-1 bg-background">
           <div className="mx-auto max-w-7xl">
             <div className="mb-8">
-              <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
-              <p className="text-muted-foreground">
-                Visualize your tasks by priority and deadline
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="mb-2 text-4xl font-bold text-foreground">Task Map</h1>
+                  <p className="text-muted-foreground">
+                    Visualize your tasks by priority and deadline
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {isOnline ? (
+                    <Wifi className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <WifiOff className="h-5 w-5 text-orange-500" />
+                  )}
+                  <span className="text-sm text-muted-foreground">
+                    {isOnline ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Mobile task creation form */}
@@ -288,9 +222,12 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
                     deadline={task.deadline}
                     importance={task.importance}
                     status={task.status}
+                    syncState={task.syncState}
+                    syncError={task.syncError}
                     size={calculateSize(task.deadline, task.importance)}
                     onClick={() => setEditingTask(task)}
                     onDelete={handleDeleteTask}
+                    onRetry={() => retryFailedTask(task.id)}
                   />
                 ))
               )}

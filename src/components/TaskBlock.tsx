@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { Trash2, Calendar, Star, Check } from "lucide-react";
+import { Trash2, Calendar, Star, Check, Loader2, AlertCircle, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { useState, useRef } from "react";
+import { SyncState } from "@/lib/db";
 
 interface TaskBlockProps {
   id: string;
@@ -11,8 +12,11 @@ interface TaskBlockProps {
   importance: number;
   size: number;
   status?: string;
+  syncState?: SyncState;
+  syncError?: string;
   onClick: () => void;
   onDelete: (id: string) => void;
+  onRetry?: () => void;
 }
 
 export const TaskBlock = ({
@@ -22,8 +26,11 @@ export const TaskBlock = ({
   importance,
   size,
   status = "in_progress",
+  syncState = "synced",
+  syncError,
   onClick,
   onDelete,
+  onRetry,
 }: TaskBlockProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -155,11 +162,44 @@ export const TaskBlock = ({
             >
               {title}
             </h3>
-            {isDone && (
-              <div className="flex-shrink-0 bg-green-500 rounded-full p-1">
-                <Check style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="text-white" />
-              </div>
-            )}
+            <div className="flex flex-col items-end gap-1 flex-shrink-0">
+              {isDone && (
+                <div className="bg-green-500 rounded-full p-1">
+                  <Check style={{ width: `${iconSize}px`, height: `${iconSize}px` }} className="text-white" />
+                </div>
+              )}
+              {syncState === 'pending' && (
+                <Loader2 
+                  style={{ width: `${iconSize}px`, height: `${iconSize}px` }} 
+                  className="animate-spin text-blue-500" 
+                />
+              )}
+              {syncState === 'failed' && (
+                <div className="relative group/sync">
+                  <AlertCircle 
+                    style={{ width: `${iconSize}px`, height: `${iconSize}px` }} 
+                    className="text-red-500" 
+                  />
+                  {onRetry && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute top-0 right-0 opacity-0 group-hover/sync:opacity-100 transition-opacity"
+                      style={{ 
+                        width: `${Math.max(20, iconSize * 1.5)}px`, 
+                        height: `${Math.max(20, iconSize * 1.5)}px` 
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRetry();
+                      }}
+                    >
+                      <RotateCw style={{ width: `${iconSize}px`, height: `${iconSize}px` }} />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="space-y-1">
