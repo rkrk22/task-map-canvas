@@ -36,6 +36,10 @@ export class TaskDatabase extends Dexie {
       tasks: 'id, importance, deadline, syncState, updated_at',
       syncQueue: 'id, taskId, timestamp, retryCount'
     });
+    this.version(2).stores({
+      tasks: 'id, importance, deadline, syncState, updated_at, created_at',
+      syncQueue: 'id, taskId, timestamp, retryCount'
+    });
   }
 }
 
