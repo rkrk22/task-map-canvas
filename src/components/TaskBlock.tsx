@@ -69,10 +69,9 @@ export const TaskBlock = ({
     // Skip only if drag event hasn't started properly (browser quirk)
     if (clientX === 0 && clientY === 0) return;
     
-    const dragSize = 80;
     setPosition({
-      x: clientX - dragSize / 2,
-      y: clientY - dragSize / 2,
+      x: clientX,
+      y: clientY,
     });
   };
 
@@ -114,40 +113,33 @@ export const TaskBlock = ({
   const dragSize = 80;
 
   return (
-    <motion.div
-      layout
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
-      onClick={onClick}
-      style={{
-        width: isDragging ? `${dragSize}px` : `${Math.min(scaledSize, 200)}px`,
-        height: isDragging ? `${dragSize}px` : `${Math.min(scaledSize, 200)}px`,
-        background: `var(--task-gradient-${gradientIndex})`,
-        padding: isDragging ? '0' : `${padding}px`,
-        position: isDragging ? 'fixed' : 'relative',
-        left: isDragging ? `${position.x}px` : 'auto',
-        top: isDragging ? `${position.y}px` : 'auto',
-        zIndex: isDragging ? 1000 : 'auto',
-        transition: isDragging ? "none" : "all 0.3s ease-out",
-        opacity: isDone ? 0.6 : 1,
-        borderRadius: isDragging ? "50%" : "0.75rem",
-      }}
-      draggable
-      onDragStart={handleDragStart as any}
-      onDrag={handleDrag as any}
-      onDragEnd={handleDragEnd as any}
-      onTouchStart={handleDragStart as any}
-      onTouchMove={handleDrag as any}
-      onTouchEnd={handleDragEnd as any}
-    >
-      {isDragging ? (
-        <div className="flex h-full items-center justify-center">
-          <Check className="text-white" size={32} strokeWidth={3} />
-        </div>
-      ) : (
+    <>
+      {/* Original card - hidden during drag */}
+      <motion.div
+        layout={!isDragging}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: isDragging ? 0 : 1 }}
+        exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
+        onClick={onClick}
+        style={{
+          width: `${Math.min(scaledSize, 200)}px`,
+          height: `${Math.min(scaledSize, 200)}px`,
+          background: `var(--task-gradient-${gradientIndex})`,
+          padding: `${padding}px`,
+          opacity: isDone ? 0.6 : 1,
+          borderRadius: "0.75rem",
+          visibility: isDragging ? 'hidden' : 'visible',
+        }}
+        draggable
+        onDragStart={handleDragStart as any}
+        onDrag={handleDrag as any}
+        onDragEnd={handleDragEnd as any}
+        onTouchStart={handleDragStart as any}
+        onTouchMove={handleDrag as any}
+        onTouchEnd={handleDragEnd as any}
+      >
         <div className="flex h-full flex-col justify-between text-gray-700">
           <div className="flex items-start justify-between gap-2">
             <h3 
@@ -178,23 +170,48 @@ export const TaskBlock = ({
             </div>
           </div>
         </div>
+        
+        {!isDragging && (
+          <Button
+            size="icon"
+            variant="destructive"
+            className="absolute -right-2 -top-2 opacity-0 transition-opacity group-hover:opacity-100"
+            style={{ 
+              width: `${Math.max(24, scaledSize / 8)}px`, 
+              height: `${Math.max(24, scaledSize / 8)}px` 
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(id);
+            }}
+          >
+            <Trash2 style={{ width: `${Math.max(12, scaledSize / 16)}px`, height: `${Math.max(12, scaledSize / 16)}px` }} />
+          </Button>
+        )}
+      </motion.div>
+
+      {/* Dragging circle - only visible during drag */}
+      {isDragging && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${position.x}px`,
+            top: `${position.y}px`,
+            width: `${dragSize}px`,
+            height: `${dragSize}px`,
+            background: `var(--task-gradient-${gradientIndex})`,
+            borderRadius: "50%",
+            zIndex: 1000,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <Check className="text-white" size={32} strokeWidth={3} />
+        </div>
       )}
-      
-      <Button
-        size="icon"
-        variant="destructive"
-        className="absolute -right-2 -top-2 opacity-0 transition-opacity group-hover:opacity-100"
-        style={{ 
-          width: `${Math.max(24, scaledSize / 8)}px`, 
-          height: `${Math.max(24, scaledSize / 8)}px` 
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(id);
-        }}
-      >
-        <Trash2 style={{ width: `${Math.max(12, scaledSize / 16)}px`, height: `${Math.max(12, scaledSize / 16)}px` }} />
-      </Button>
-    </motion.div>
+    </>
   );
 };
