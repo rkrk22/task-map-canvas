@@ -51,6 +51,11 @@ export const TaskBlock = ({
     if ('dataTransfer' in e) {
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", id);
+      
+      // Create transparent drag image to hide default ghost
+      const img = new Image();
+      img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      e.dataTransfer.setDragImage(img, 0, 0);
     }
   };
 
