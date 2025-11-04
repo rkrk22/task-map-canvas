@@ -70,6 +70,7 @@ export const TaskBlock = ({
 
     if (clientX === 0 && clientY === 0) return;
     
+    const dragSize = 80; // Size during drag
     setPosition({
       x: clientX - originRef.current.x - scaledSize / 2,
       y: clientY - originRef.current.y - scaledSize / 2,
@@ -111,6 +112,7 @@ export const TaskBlock = ({
   };
 
   const isDone = status === "done";
+  const dragSize = 80;
 
   return (
     <motion.div
@@ -122,14 +124,15 @@ export const TaskBlock = ({
       className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
       onClick={onClick}
       style={{
-        width: isDragging ? `${Math.min(scaledSize, 200)}px` : `${Math.min(scaledSize, 200)}px`,
-        height: isDragging ? `${Math.min(scaledSize, 200)}px` : `${Math.min(scaledSize, 200)}px`,
+        width: isDragging ? `${dragSize}px` : `${Math.min(scaledSize, 200)}px`,
+        height: isDragging ? `${dragSize}px` : `${Math.min(scaledSize, 200)}px`,
         background: `var(--task-gradient-${gradientIndex})`,
-        padding: `${padding}px`,
+        padding: isDragging ? '0' : `${padding}px`,
         transform: isDragging ? `translate(${position.x}px, ${position.y}px)` : undefined,
-        transition: isDragging ? "none" : "transform 0.3s ease-out",
+        transition: isDragging ? "none" : "transform 0.3s ease-out, width 0.2s ease, height 0.2s ease, border-radius 0.2s ease",
         opacity: isDone ? 0.6 : 1,
-        borderRadius: isDragging ? "0.5rem" : "0.75rem",
+        borderRadius: isDragging ? "50%" : "0.75rem",
+        pointerEvents: isDragging ? "none" : "auto",
       }}
       draggable
       onDragStart={handleDragStart as any}
@@ -141,7 +144,7 @@ export const TaskBlock = ({
     >
       {isDragging ? (
         <div className="flex h-full items-center justify-center">
-          <span className="text-gray-700 font-bold text-lg">done?</span>
+          <Check className="text-white" size={32} strokeWidth={3} />
         </div>
       ) : (
         <div className="flex h-full flex-col justify-between text-gray-700">
