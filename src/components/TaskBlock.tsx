@@ -55,8 +55,6 @@ export const TaskBlock = ({
   };
 
   const handleDrag = (e: React.DragEvent | React.TouchEvent) => {
-    if (!isDragging) return;
-    
     let clientX: number, clientY: number;
     if ('touches' in e && e.touches.length > 0) {
       clientX = e.touches[0].clientX;
@@ -68,12 +66,13 @@ export const TaskBlock = ({
       return;
     }
 
+    // Skip only if drag event hasn't started properly (browser quirk)
     if (clientX === 0 && clientY === 0) return;
     
-    const dragSize = 80; // Size during drag
+    const dragSize = 80;
     setPosition({
-      x: clientX - originRef.current.x - scaledSize / 2,
-      y: clientY - originRef.current.y - scaledSize / 2,
+      x: clientX - dragSize / 2,
+      y: clientY - dragSize / 2,
     });
   };
 
@@ -128,11 +127,13 @@ export const TaskBlock = ({
         height: isDragging ? `${dragSize}px` : `${Math.min(scaledSize, 200)}px`,
         background: `var(--task-gradient-${gradientIndex})`,
         padding: isDragging ? '0' : `${padding}px`,
-        transform: isDragging ? `translate(${position.x}px, ${position.y}px)` : undefined,
-        transition: isDragging ? "none" : "transform 0.3s ease-out, width 0.2s ease, height 0.2s ease, border-radius 0.2s ease",
+        position: isDragging ? 'fixed' : 'relative',
+        left: isDragging ? `${position.x}px` : 'auto',
+        top: isDragging ? `${position.y}px` : 'auto',
+        zIndex: isDragging ? 1000 : 'auto',
+        transition: isDragging ? "none" : "all 0.3s ease-out",
         opacity: isDone ? 0.6 : 1,
         borderRadius: isDragging ? "50%" : "0.75rem",
-        pointerEvents: isDragging ? "none" : "auto",
       }}
       draggable
       onDragStart={handleDragStart as any}
