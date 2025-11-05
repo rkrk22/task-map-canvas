@@ -26,9 +26,9 @@ export const TaskBlock = ({
   onDelete,
 }: TaskBlockProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isPointerDown, setIsPointerDown] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
-  const dragTimerRef = useState<NodeJS.Timeout | null>(null)[0];
   const startPosRef = useState({ x: 0, y: 0 })[0];
   const baseSize = 60;
   // Increase base size for low importance tasks (1/10)
@@ -49,6 +49,7 @@ export const TaskBlock = ({
     e.preventDefault();
     e.stopPropagation();
     
+    setIsPointerDown(true);
     startPosRef.x = e.clientX;
     startPosRef.y = e.clientY;
     setPosition({ x: e.clientX, y: e.clientY });
@@ -58,6 +59,7 @@ export const TaskBlock = ({
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isPointerDown) return;
     e.preventDefault();
     
     const deltaX = Math.abs(e.clientX - startPosRef.x);
@@ -79,6 +81,7 @@ export const TaskBlock = ({
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isPointerDown) return;
     e.preventDefault();
 
     // If we actually dragged, check if dropped on character
@@ -101,6 +104,7 @@ export const TaskBlock = ({
       onClick();
     }
 
+    setIsPointerDown(false);
     setIsDragging(false);
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
