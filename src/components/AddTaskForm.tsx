@@ -56,13 +56,13 @@ export const AddTaskForm = ({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={date} onSelect={(newDate) => {
-                  if (newDate) {
-                    setDate(newDate);
-                    // Close popover by clicking outside
-                    document.body.click();
-                  }
-                }} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
+                <Calendar mode="single" selected={date} onSelect={newDate => {
+                if (newDate) {
+                  setDate(newDate);
+                  // Close popover by clicking outside
+                  document.body.click();
+                }
+              }} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
               </PopoverContent>
             </Popover>
           </div>
@@ -71,7 +71,7 @@ export const AddTaskForm = ({
             <Label htmlFor="importance">
               Importance: {importance}/10
             </Label>
-            <input id="importance" type="range" min="1" max="10" value={importance} onChange={e => setImportance(Number(e.target.value))} className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-foreground [&::-moz-range-thumb]:border-0" />
+            <input id="importance" type="range" min="1" max="10" value={importance} onChange={e => setImportance(Number(e.target.value))} className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer\n[&::-webkit-slider-thumb]:appearance-none\n[&::-webkit-slider-thumb]:w-5\n[&::-webkit-slider-thumb]:h-5\n[&::-webkit-slider-thumb]:rounded-full\n[&::-webkit-slider-thumb]:bg-gray-700\n[&::-moz-range-thumb]:w-5\n[&::-moz-range-thumb]:h-5\n[&::-moz-range-thumb]:rounded-full\n[&::-moz-range-thumb]:bg-gray-700\n[&::-moz-range-thumb]:border-0\n" />
           </div>
         </div>
 
