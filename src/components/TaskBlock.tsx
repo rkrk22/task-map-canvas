@@ -27,6 +27,9 @@ export const TaskBlock = ({
 }: TaskBlockProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
+  const dragTimerRef = useState<NodeJS.Timeout | null>(null)[0];
+  const startPosRef = useState({ x: 0, y: 0 })[0];
   const baseSize = 60;
   // Increase base size for low importance tasks (1/10)
   const importanceBoost = importance === 1 ? 15 : 0;
@@ -46,42 +49,61 @@ export const TaskBlock = ({
     e.preventDefault();
     e.stopPropagation();
     
-    setIsDragging(true);
+    startPosRef.x = e.clientX;
+    startPosRef.y = e.clientY;
     setPosition({ x: e.clientX, y: e.clientY });
+    setHasMoved(false);
     
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
     e.preventDefault();
     
-    setPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
+    const deltaX = Math.abs(e.clientX - startPosRef.x);
+    const deltaY = Math.abs(e.clientY - startPosRef.y);
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    // Start dragging only after moving at least 10px
+    if (!hasMoved && distance > 10) {
+      setHasMoved(true);
+      setIsDragging(true);
+    }
+    
+    if (isDragging) {
+      setPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (!isDragging) return;
     e.preventDefault();
 
-    const characterEl = document.getElementById("character-drop-zone");
-    if (characterEl) {
-      const rect = characterEl.getBoundingClientRect();
-      const isOverCharacter =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
+    // If we actually dragged, check if dropped on character
+    if (isDragging && hasMoved) {
+      const characterEl = document.getElementById("character-drop-zone");
+      if (characterEl) {
+        const rect = characterEl.getBoundingClientRect();
+        const isOverCharacter =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom;
 
-      if (isOverCharacter) {
-        window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id, x: e.clientX, y: e.clientY } }));
+        if (isOverCharacter) {
+          window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id, x: e.clientX, y: e.clientY } }));
+        }
       }
+    } else if (!hasMoved) {
+      // It was a click, trigger onClick
+      onClick();
     }
 
     setIsDragging(false);
     setPosition({ x: 0, y: 0 });
+    setHasMoved(false);
     
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   };
@@ -99,7 +121,6 @@ export const TaskBlock = ({
         exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
         className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
-        onClick={!isDragging ? onClick : undefined}
         style={{
           width: `${Math.min(scaledSize, 200)}px`,
           height: `${Math.min(scaledSize, 200)}px`,

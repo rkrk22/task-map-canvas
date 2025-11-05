@@ -68,7 +68,18 @@ export const TaskMap = () => {
 
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(console.error);
+        // For mobile browsers, we need to ensure audio can play
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            // Auto-play was prevented, try to enable audio on user interaction
+            console.log("Audio playback prevented:", error);
+            // Create a new audio context for mobile
+            const audio = new Audio(taskDoneSound);
+            audio.volume = 1.0;
+            audio.play().catch(console.error);
+          });
+        }
       }
 
       const burstId = particleIdRef.current++;
