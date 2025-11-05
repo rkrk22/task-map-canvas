@@ -104,12 +104,21 @@ export const TaskBlock = ({
       onClick();
     }
 
+    // Always clean up states
+    cleanupDragState(e);
+  };
+
+  const cleanupDragState = (e: React.PointerEvent) => {
     setIsPointerDown(false);
     setIsDragging(false);
     setPosition({ x: 0, y: 0 });
     setHasMoved(false);
     
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    try {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch (error) {
+      // Ignore errors if pointer capture was already released
+    }
   };
 
   const isDone = status === "done";
@@ -140,6 +149,12 @@ export const TaskBlock = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onPointerLeave={(e) => {
+          // Clean up if pointer leaves while dragging
+          if (isDragging) {
+            cleanupDragState(e);
+          }
+        }}
       >
         <div className="flex h-full flex-col justify-between text-gray-700">
           <div className="flex items-start justify-between gap-2">
