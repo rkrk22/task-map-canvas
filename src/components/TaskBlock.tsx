@@ -198,7 +198,12 @@ export const TaskBlock = ({
             }}
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               onDelete(id);
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
             }}
           >
             <Trash2 style={{ width: `${Math.max(12, scaledSize / 16)}px`, height: `${Math.max(12, scaledSize / 16)}px` }} />
