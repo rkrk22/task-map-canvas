@@ -48,21 +48,21 @@ All colors MUST be HSL.
     --task-shadow: 0 4px 20px -4px hsl(340 35% 60% / 0.25);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 36 100% 97%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 20 14.3% 4.1%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 24 9.8% 10%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 60 9.1% 97.8%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 36 64% 57%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 20 14.3% 4.1%;
 
-    --sidebar-border: 220 13% 91%;
+    --sidebar-border: 30 80% 70%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 20 14.3% 4.1%;
   }
 
   .dark {
