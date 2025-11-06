@@ -128,11 +128,10 @@ export const TaskBlock = ({
     <>
       {/* Original card - hidden during drag */}
       <motion.div
-        layout={!isDragging}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: isDragging ? 0 : 1 }}
         exit={{ scale: 0, opacity: 0, transition: { duration: 0 } }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        transition={{ opacity: { duration: 0.15 } }}
         className="group relative cursor-move rounded-xl shadow-lg transition-all hover:shadow-xl"
         style={{
           width: `${Math.min(scaledSize, 200)}px`,
@@ -141,7 +140,7 @@ export const TaskBlock = ({
           padding: `${padding}px`,
           opacity: isDone ? 0.6 : 1,
           borderRadius: "0.75rem",
-          visibility: isDragging ? 'hidden' : 'visible',
+          pointerEvents: isDragging ? 'none' : 'auto',
           touchAction: 'none',
           userSelect: 'none',
         }}
