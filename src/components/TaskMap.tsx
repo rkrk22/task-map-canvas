@@ -264,7 +264,7 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="flex min-h-screen w-full gap-6 p-6">
+      <div className="flex min-h-screen w-full gap-3 p-6">
         {/* Desktop sidebar */}
         <div className="hidden md:block">
           <TaskSidebar onAdd={handleAddTask} />
@@ -284,7 +284,7 @@ const insertTask = async (task: { title: string; deadline: string; importance: n
               <TaskSidebar onAdd={handleAddTask} />
             </div>
 
-            <div className="flex flex-wrap gap-6 rounded-2xl border-2 border-border bg-muted/20 p-8">
+            <div className="flex flex-wrap gap-3 rounded-2xl border-2 border-border bg-muted/20 p-8">
               {tasks.length === 0 ? (
                 <div className="flex w-full items-center justify-center py-20">
                   <p className="text-lg text-muted-foreground">

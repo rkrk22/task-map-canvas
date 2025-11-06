@@ -98,8 +98,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
                   onSelect={(newDate) => {
                     if (newDate) {
                       setDate(newDate);
-                      // Close popover by clicking outside
-                      document.body.click();
+                      setTimeout(() => document.body.click(), 0);
                     }
                   }}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
@@ -121,7 +120,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
               max="10"
               value={importance}
               onChange={(e) => setImportance(Number(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-foreground [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-foreground [&::-moz-range-thumb]:border-0"
+              className="w-full h-2 bg-[hsl(var(--importance-track))] rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[hsl(var(--importance-thumb))] [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[hsl(var(--importance-thumb))] [&::-moz-range-thumb]:border-0"
             />
           </div>
 

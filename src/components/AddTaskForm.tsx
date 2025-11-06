@@ -38,11 +38,11 @@ export const AddTaskForm = ({
     setImportance(5);
     toast.success("Task added successfully!");
   };
-  return <Card className="mb-8 border-2 p-6 bg-[#fefaef]">
+  return <Card className="mb-8 border-2 p-6 bg-[hsl(var(--task-form-background))] border-[hsl(var(--task-form-border))]">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Task Title</Label>
-          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2" autoComplete="off" />
+          <Input id="title" placeholder="Enter task name..." value={title} onChange={e => setTitle(e.target.value)} className="border-2 border-[hsl(var(--task-form-border))]" autoComplete="off" />
         </div>
 
         <div className="space-y-4">
@@ -50,7 +50,7 @@ export const AddTaskForm = ({
             <Label>Due Date</Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-full justify-start text-left font-normal border-2", !date && "text-muted-foreground")}>
+                <Button variant="outline" className={cn("w-full justify-start text-left font-normal border-2 border-[hsl(var(--task-form-border))]", !date && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, "PPP") : <span>Pick a date</span>}
                 </Button>
@@ -59,8 +59,7 @@ export const AddTaskForm = ({
                 <Calendar mode="single" selected={date} onSelect={newDate => {
                 if (newDate) {
                   setDate(newDate);
-                  // Close popover by clicking outside
-                  document.body.click();
+                  setTimeout(() => document.body.click(), 0);
                 }
               }} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
               </PopoverContent>
@@ -71,7 +70,18 @@ export const AddTaskForm = ({
             <Label htmlFor="importance">
               Importance: {importance}/10
             </Label>
-            <input id="importance" type="range" min="1" max="10" value={importance} onChange={e => setImportance(Number(e.target.value))} className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer\n[&::-webkit-slider-thumb]:appearance-none\n[&::-webkit-slider-thumb]:w-5\n[&::-webkit-slider-thumb]:h-5\n[&::-webkit-slider-thumb]:rounded-full\n[&::-webkit-slider-thumb]:bg-gray-700\n[&::-moz-range-thumb]:w-5\n[&::-moz-range-thumb]:h-5\n[&::-moz-range-thumb]:rounded-full\n[&::-moz-range-thumb]:bg-gray-700\n[&::-moz-range-thumb]:border-0\n" />
+            <input id="importance" type="range" min="1" max="10" value={importance} onChange={e => setImportance(Number(e.target.value))} className="w-full h-2 bg-[hsl(var(--importance-track))] rounded-lg appearance-none cursor-pointer
+[&::-webkit-slider-thumb]:appearance-none
+[&::-webkit-slider-thumb]:w-5
+[&::-webkit-slider-thumb]:h-5
+[&::-webkit-slider-thumb]:rounded-full
+[&::-webkit-slider-thumb]:bg-[hsl(var(--importance-thumb))]
+[&::-moz-range-thumb]:w-5
+[&::-moz-range-thumb]:h-5
+[&::-moz-range-thumb]:rounded-full
+[&::-moz-range-thumb]:bg-[hsl(var(--importance-thumb))]
+[&::-moz-range-thumb]:border-0
+" />
           </div>
         </div>
 

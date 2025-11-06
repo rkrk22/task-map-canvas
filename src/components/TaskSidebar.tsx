@@ -14,7 +14,7 @@ export function TaskSidebar({
   return <Sidebar className="w-80 border-border" collapsible="none">
       
       
-      <SidebarContent className="bg-[#fcf6ed]">
+      <SidebarContent className="bg-[hsl(var(--task-form-background))]">
         <SidebarGroup className="mx-0 px-[22px]">
           <SidebarGroupLabel>New Task</SidebarGroupLabel>
           <SidebarGroupContent>
