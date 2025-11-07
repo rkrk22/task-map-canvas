@@ -30,8 +30,6 @@ export const TaskBlock = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
   const startPosRef = useState({ x: 0, y: 0 })[0];
-  const lastTapTime = useState(0)[0];
-  const lastTapTimeRef = { current: 0 };
   const baseSize = 60;
   // Increase base size for low importance tasks (1/10)
   const importanceBoost = importance === 1 ? 15 : 0;
@@ -47,8 +45,8 @@ export const TaskBlock = ({
   const gradientIndex = Math.min(6, Math.max(1, Math.ceil((importance / 10) * 6)));
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Allow touch events or left mouse button only
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.button !== 0) return; // Only left click
+    e.preventDefault();
     e.stopPropagation();
     
     setIsPointerDown(true);
@@ -68,11 +66,8 @@ export const TaskBlock = ({
     const deltaY = Math.abs(e.clientY - startPosRef.y);
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    // Use smaller threshold for touch to detect drag intent more accurately
-    const threshold = e.pointerType === 'touch' ? 15 : 10;
-    
-    // Start dragging only after moving beyond threshold
-    if (!hasMoved && distance > threshold) {
+    // Start dragging only after moving at least 10px
+    if (!hasMoved && distance > 10) {
       setHasMoved(true);
       setIsDragging(true);
     }
@@ -87,14 +82,10 @@ export const TaskBlock = ({
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!isPointerDown) return;
-    
-    const deltaX = Math.abs(e.clientX - startPosRef.x);
-    const deltaY = Math.abs(e.clientY - startPosRef.y);
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    const threshold = e.pointerType === 'touch' ? 15 : 10;
+    e.preventDefault();
 
     // If we actually dragged, check if dropped on character
-    if (isDragging && distance > threshold) {
+    if (isDragging && hasMoved) {
       const characterEl = document.getElementById("character-drop-zone");
       if (characterEl) {
         const rect = characterEl.getBoundingClientRect();
@@ -108,25 +99,9 @@ export const TaskBlock = ({
           window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id, x: e.clientX, y: e.clientY } }));
         }
       }
-    } else if (distance <= threshold) {
-      const now = Date.now();
-      const timeSinceLastTap = now - lastTapTimeRef.current;
-      
-      // For touch devices, require double tap (within 500ms)
-      // For mouse, single click works
-      if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-        if (timeSinceLastTap < 500) {
-          // Double tap detected, open dialog
-          onClick();
-          lastTapTimeRef.current = 0; // Reset
-        } else {
-          // First tap, just record the time
-          lastTapTimeRef.current = now;
-        }
-      } else {
-        // Mouse click, open immediately
-        onClick();
-      }
+    } else if (!hasMoved) {
+      // It was a click, trigger onClick
+      onClick();
     }
 
     // Always clean up states
