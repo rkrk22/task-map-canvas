@@ -45,8 +45,8 @@ export const TaskBlock = ({
   const gradientIndex = Math.min(6, Math.max(1, Math.ceil((importance / 10) * 6)));
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.button !== 0) return; // Only left click
-    e.preventDefault();
+    // Allow touch events or left mouse button only
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.stopPropagation();
     
     setIsPointerDown(true);
@@ -66,8 +66,11 @@ export const TaskBlock = ({
     const deltaY = Math.abs(e.clientY - startPosRef.y);
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    // Start dragging only after moving at least 10px
-    if (!hasMoved && distance > 10) {
+    // Use smaller threshold for touch to detect drag intent more accurately
+    const threshold = e.pointerType === 'touch' ? 15 : 10;
+    
+    // Start dragging only after moving beyond threshold
+    if (!hasMoved && distance > threshold) {
       setHasMoved(true);
       setIsDragging(true);
     }
@@ -82,10 +85,14 @@ export const TaskBlock = ({
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!isPointerDown) return;
-    e.preventDefault();
+    
+    const deltaX = Math.abs(e.clientX - startPosRef.x);
+    const deltaY = Math.abs(e.clientY - startPosRef.y);
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const threshold = e.pointerType === 'touch' ? 15 : 10;
 
     // If we actually dragged, check if dropped on character
-    if (isDragging && hasMoved) {
+    if (isDragging && distance > threshold) {
       const characterEl = document.getElementById("character-drop-zone");
       if (characterEl) {
         const rect = characterEl.getBoundingClientRect();
@@ -99,8 +106,8 @@ export const TaskBlock = ({
           window.dispatchEvent(new CustomEvent("task-dropped", { detail: { taskId: id, x: e.clientX, y: e.clientY } }));
         }
       }
-    } else if (!hasMoved) {
-      // It was a click, trigger onClick
+    } else if (distance <= threshold) {
+      // It was a tap/click, trigger onClick immediately
       onClick();
     }
 
