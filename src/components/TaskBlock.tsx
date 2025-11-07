@@ -30,6 +30,8 @@ export const TaskBlock = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [hasMoved, setHasMoved] = useState(false);
   const startPosRef = useState({ x: 0, y: 0 })[0];
+  const lastTapTime = useState(0)[0];
+  const lastTapTimeRef = { current: 0 };
   const baseSize = 60;
   // Increase base size for low importance tasks (1/10)
   const importanceBoost = importance === 1 ? 15 : 0;
@@ -107,8 +109,24 @@ export const TaskBlock = ({
         }
       }
     } else if (distance <= threshold) {
-      // It was a tap/click, trigger onClick immediately
-      onClick();
+      const now = Date.now();
+      const timeSinceLastTap = now - lastTapTimeRef.current;
+      
+      // For touch devices, require double tap (within 500ms)
+      // For mouse, single click works
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+        if (timeSinceLastTap < 500) {
+          // Double tap detected, open dialog
+          onClick();
+          lastTapTimeRef.current = 0; // Reset
+        } else {
+          // First tap, just record the time
+          lastTapTimeRef.current = now;
+        }
+      } else {
+        // Mouse click, open immediately
+        onClick();
+      }
     }
 
     // Always clean up states
