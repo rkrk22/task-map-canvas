@@ -8,59 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 45 71% 97%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 35 50% 96%;
+    --foreground: 0 0% 20%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 35 50% 98%;
+    --card-foreground: 0 0% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 35 50% 98%;
+    --popover-foreground: 0 0% 20%;
 
-    --primary: 340 65% 75%;
+    --primary: 350 70% 70%;
     --primary-foreground: 0 0% 20%;
 
-    --secondary: 190 60% 72%;
+    --secondary: 45 85% 75%;
     --secondary-foreground: 0 0% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 35 40% 92%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 280 65% 80%;
+    --accent: 270 55% 75%;
     --accent-foreground: 0 0% 20%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 340 65% 75%;
+    --border: 35 30% 88%;
+    --input: 35 30% 88%;
+    --ring: 350 70% 70%;
 
     --radius: 0.75rem;
     
     /* Custom task colors - soft pastel palette matching reference */
-    --task-gradient-1: linear-gradient(135deg, hsl(340 65% 75%) 0%, hsl(350 60% 78%) 100%);
-    --task-gradient-2: linear-gradient(135deg, hsl(45 75% 70%) 0%, hsl(35 70% 72%) 100%);
-    --task-gradient-3: linear-gradient(135deg, hsl(150 45% 75%) 0%, hsl(160 50% 77%) 100%);
-    --task-gradient-4: linear-gradient(135deg, hsl(210 55% 78%) 0%, hsl(200 50% 80%) 100%);
-    --task-gradient-5: linear-gradient(135deg, hsl(20 70% 75%) 0%, hsl(15 65% 77%) 100%);
-    --task-gradient-6: linear-gradient(135deg, hsl(280 50% 78%) 0%, hsl(290 55% 80%) 100%);
-    --task-shadow: 0 4px 20px -4px hsl(340 35% 60% / 0.25);
+    --task-gradient-1: linear-gradient(135deg, hsl(350 70% 70%) 0%, hsl(355 65% 72%) 100%);
+    --task-gradient-2: linear-gradient(135deg, hsl(45 85% 75%) 0%, hsl(40 80% 72%) 100%);
+    --task-gradient-3: linear-gradient(135deg, hsl(120 40% 75%) 0%, hsl(125 45% 72%) 100%);
+    --task-gradient-4: linear-gradient(135deg, hsl(200 50% 75%) 0%, hsl(205 45% 72%) 100%);
+    --task-gradient-5: linear-gradient(135deg, hsl(25 70% 75%) 0%, hsl(20 65% 72%) 100%);
+    --task-gradient-6: linear-gradient(135deg, hsl(270 55% 75%) 0%, hsl(275 50% 72%) 100%);
+    --task-shadow: 0 4px 20px -4px hsl(350 40% 60% / 0.2);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 36 43% 95%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 36 27% 84%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 35 50% 96%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 350 70% 70%;
+    --sidebar-primary-foreground: 0 0% 20%;
+    --sidebar-accent: 35 40% 92%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 35 30% 88%;
+    --sidebar-ring: 350 70% 70%;
     
-    --task-form-background: 36 43% 95%;
-    --task-form-border: 36 27% 84%;
-    --importance-track: 36 27% 84%;
-    --importance-thumb: 60 1% 60%;
+    --task-form-background: 35 50% 96%;
+    --task-form-border: 35 30% 88%;
+    --importance-track: 35 30% 88%;
+    --importance-thumb: 0 0% 50%;
   }
 
   .dark {
