@@ -31,6 +31,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -78,7 +79,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
 
           <div>
             <Label>Due Date</Label>
-            <Popover>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -98,7 +99,7 @@ export const EditTaskDialog = ({ task, onClose, onUpdate }: EditTaskDialogProps)
                   onSelect={(newDate) => {
                     if (newDate) {
                       setDate(newDate);
-                      setTimeout(() => document.body.click(), 0);
+                      setCalendarOpen(false);
                     }
                   }}
                   disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}

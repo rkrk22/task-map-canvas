@@ -22,6 +22,7 @@ export const AddTaskForm = ({
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [importance, setImportance] = useState(5);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -48,7 +49,7 @@ export const AddTaskForm = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Due Date</Label>
-            <Popover>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-full justify-start text-left font-normal border-2 border-[hsl(var(--task-form-border))]", !date && "text-muted-foreground")}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -59,7 +60,7 @@ export const AddTaskForm = ({
                 <Calendar mode="single" selected={date} onSelect={newDate => {
                 if (newDate) {
                   setDate(newDate);
-                  setTimeout(() => document.body.click(), 0);
+                  setCalendarOpen(false);
                 }
               }} disabled={date => date < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="pointer-events-auto" />
               </PopoverContent>
